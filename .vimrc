@@ -141,6 +141,8 @@ hi Pmenu term=bold cterm=reverse ctermbg=7
 "showmatchの色も見辛いので変更
 hi MatchParen cterm=bold ctermbg=8
 
+"diff時にテキストが赤いので見えないから変更
+hi DiffText term=reverse cterm=bold ctermbg=11 gui=bold guibg=Red
 
 "---------------------------------------------------------------------------------------
 " オプション設定
@@ -244,16 +246,24 @@ nnoremap vb /{<CR>:noh<CR>%v%0
 
 " vimdiff用
 if &diff
-	map <C-p> [c
-	map <C-n> ]c
-	map <C-h> do
-	map <C-l> dp
+	nmap <C-p> [c
+	nmap <C-n> ]c
+	nmap <C-h> do
+	nmap <BS>  do
+	nmap <C-l> dp
 endif
 
 " 縦に並んだ数値を連番にする
 nnoremap <silent> ,co :ContinuousNumber <C-a><CR>
 vnoremap <silent> ,co :ContinuousNumber <C-a><CR>
 command! -count -nargs=1 ContinuousNumber let c = col('.')|for n in range(1, <count>?<count>-line('.'):1)|exec 'normal! j' . n . <q-args>|call cursor('.', c)|endfor
+
+" 数値の上で実行時にVCSAnnotateをリビジョン付きで呼び出す
+au FileType svnannotate nnoremap <silent><buffer> <C-w>F :VCSAnnotate -r <C-r><C-w><CR>
+" 数値の上で実行時にVCSLogをリビジョン付きで呼び出す
+au FileType svnannotate nnoremap <silent><buffer> <C-w>L :VCSLog -r <C-r><C-w><CR>
+" 数値の上で実行時にVCSDiffをリビジョン付きで呼び出す
+au FileType svnannotate nnoremap <silent><buffer> <C-w>D :VCSDiff -c <C-r><C-w><CR>
 
 "---------------------------------------------------------------------------------------
 " 文字コード関連
@@ -502,25 +512,29 @@ NeoBundle 'Shougo/vimproc'
 " My Bundle
 NeoBundle 'Shougo/unite.vim'
 NeoBundle 'Shougo/unite-build'
+NeoBundle 'Shougo/unite-outline'
 NeoBundle 'ujihisa/unite-locate'
 NeoBundle 'tsukkee/unite-tag'
-NeoBundle 'h1mesuke/unite-outline'
 NeoBundle 'osyo-manga/unite-quickfix'
-NeoBundle "osyo-manga/unite-airline_themes"
+NeoBundle 'osyo-manga/unite-airline_themes'
 NeoBundle 'kmnk/vim-unite-svn'
 
-NeoBundle 'Shougo/neocomplcache'
-"NeoBundle 'Shougo/neocomplete'
+NeoBundle has('lua') ? 'Shougo/neocomplete' : 'Shougo/neocomplcache'
 NeoBundle 'Shougo/neosnippet'
+NeoBundle 'Shougo/neosnippet-snippets'
 NeoBundle 'Shougo/vimshell'
 NeoBundle 'Shougo/vimfiler'
-NeoBundle "Shougo/context_filetype.vim"
+NeoBundle 'Shougo/context_filetype.vim'
 
 NeoBundle 'thinca/vim-quickrun'
 NeoBundle 'osyo-manga/shabadou.vim'
 NeoBundle 'osyo-manga/vim-watchdogs'
 NeoBundle 'dannyob/quickfixstatus'
 NeoBundle 'jceb/vim-hier'
+
+NeoBundle 'mattn/webapi-vim'
+NeoBundle 'mattn/vdbi-vim'
+NeoBundle 'mattn/excelview-vim'
 
 NeoBundle 'thinca/vim-ref'
 NeoBundle 'thinca/vim-splash'
@@ -529,25 +543,31 @@ NeoBundle 'thinca/vim-localrc'
 NeoBundle 'thinca/vim-visualstar'
 
 NeoBundle 'kana/vim-submode'
-NeoBundle "kana/vim-textobj-user"
+NeoBundle 'kana/vim-textobj-user'
 NeoBundle 'kana/vim-smartchr'
 NeoBundle 'kana/vim-smartinput'
-NeoBundle "cohama/vim-smartinput-endwise"
+NeoBundle 'cohama/vim-smartinput-endwise'
 
 NeoBundle 'tyru/capture.vim'
 NeoBundle 'tyru/caw.vim'
-NeoBundle "tyru/current-func-info.vim"
+NeoBundle 'tyru/current-func-info.vim'
 
-NeoBundle "osyo-manga/vim-precious"
-NeoBundle "osyo-manga/vim-textobj-multiblock"
-NeoBundle "osyo-manga/vim-anzu"
-NeoBundle "osyo-manga/vim-automatic"
-NeoBundle "osyo-manga/vim-fancy"
-NeoBundle "osyo-manga/vim-over"
+NeoBundle 'osyo-manga/vim-precious'
+NeoBundle 'osyo-manga/vim-textobj-multiblock'
+NeoBundle 'osyo-manga/vim-anzu'
+NeoBundle 'osyo-manga/vim-automatic'
+NeoBundle 'osyo-manga/vim-fancy'
+NeoBundle 'osyo-manga/vim-over'
+NeoBundle 'osyo-manga/vim-stargate'
+NeoBundle 'osyo-manga/vim-marching'
+
+NeoBundle 't9md/vim-quickhl'
+NeoBundle 't9md/vim-choosewin'
 
 "NeoBundle 'alpaca-tc/alpaca_powertabline'
 "NeoBundle 'Lokaltog/powerline', { 'rtp' : 'powerline/bindings/vim'}
-NeoBundle "bling/vim-airline"
+"NeoBundle 'bling/vim-airline'
+NeoBundle 'itchyny/lightline.vim'
 
 NeoBundle 'kien/ctrlp.vim'
 NeoBundle 'glidenote/memolist.vim'
@@ -561,6 +581,13 @@ NeoBundle 'gregsexton/VimCalc'
 NeoBundle 'yonchu/accelerated-smooth-scroll'
 NeoBundle 'deris/vim-rengbang'
 NeoBundle 'LeafCage/yankround.vim'
+NeoBundle 'terryma/vim-expand-region'
+NeoBundle 'AndrewRadev/linediff.vim'
+NeoBundle 'AndrewRadev/switch.vim'
+NeoBundle 'mhinz/vim-signify'
+NeoBundle 'itchyny/calendar.vim'
+NeoBundle 'cocopon/colorswatch.vim'
+NeoBundle 'vim-jp/vimdoc-ja'
 
 NeoBundle 'vim-scripts/Align'
 "NeoBundle 'vim-scripts/YankRing.vim'
@@ -598,6 +625,7 @@ nnoremap <silent> ,ua :<C-u>UniteWithBufferDir -buffer-name=files buffer file_mr
 
 " ショートカット
 nmap <silent> <Space>f :silent! Unite -default-action=split buffer file_mru:long<CR>
+nmap <silent> <Space>b :silent! Unite -default-action=split buffer<CR>
 nmap <silent> <Space>e :silent! UniteWithBufferDir file_mru:long<CR>
 "nmap <silent> <Space>s :silent! UniteWithBufferDir -default-action=split file_mru<CR>
 
@@ -623,7 +651,12 @@ nnoremap <silent> ,uc :<C-u>UniteClose default<CR>
 
 " unite-build"{{{
 "-------------------------
-nnoremap <silent> make :<C-u>Unite build<CR><ESC><C-w>p
+"nnoremap <silent> ,ub :<C-u>Unite build<CR><ESC><C-w>p
+"}}}
+
+" unite-outline"{{{
+"-------------------------
+nnoremap <silent> ,uo :<C-u>Unite outline<CR>
 "}}}
 
 " unite-tag"{{{
@@ -638,77 +671,134 @@ nnoremap <silent> ,us :<C-u>Unite svn/status<CR>
 
 " neocomplcache"{{{
 "-------------------------
-" 補完ウィンドウの設定
-set completeopt=menuone
+if neobundle#is_installed('neocomplcache')
+	" 補完ウィンドウの設定
+	set completeopt=menuone
 
-" 起動時に有効化
-let g:neocomplcache_enable_at_startup = 1
+	" 起動時に有効化
+	let g:neocomplcache_enable_at_startup = 1
 
-" 大文字が入力されるまで大文字小文字の区別を無視する
-"let g:neocomplcache_enable_smart_case = 1
+	" 大文字が入力されるまで大文字小文字の区別を無視する
+	"let g:neocomplcache_enable_smart_case = 1
 
-" _(アンダースコア)区切りの補完を有効化
-"let g:neocomplcache_enable_underbar_completion = 1
-"let g:neocomplcache_enable_camel_case_completion  =  1
+	" _(アンダースコア)区切りの補完を有効化
+	"let g:neocomplcache_enable_underbar_completion = 1
+	"let g:neocomplcache_enable_camel_case_completion  =  1
 
-" ポップアップメニューで表示される候補の数
-let g:neocomplcache_max_list = 20
+	" ポップアップメニューで表示される候補の数
+	let g:neocomplcache_max_list = 20
 
-" シンタックスをキャッシュするときの最小文字長
-let g:neocomplcache_min_syntax_length = 3
+	" シンタックスをキャッシュするときの最小文字長
+	let g:neocomplcache_min_syntax_length = 3
 
-" ディクショナリ定義
-let g:neocomplcache_dictionary_filetype_lists = {
-\ 'default' : '',
-\ 'php' : $HOME . '/.vim/dict/php.dict',
-\ 'ctp' : $HOME . '/.vim/dict/php.dict'
-\ }
+	" ディクショナリ定義
+	let g:neocomplcache_dictionary_filetype_lists = {
+	\ 'default' : '',
+	\ 'php' : $HOME . '/.vim/dict/php.dict',
+	\ 'ctp' : $HOME . '/.vim/dict/php.dict'
+	\ }
 
-"if !exists('g:neocomplcache_keyword_patterns')
-"  let g:neocomplcache_keyword_patterns = {}
-"endif
-"let g:neocomplcache_keyword_patterns['default'] = '\h\w*'
+	"if !exists('g:neocomplcache_keyword_patterns')
+	"  let g:neocomplcache_keyword_patterns = {}
+	"endif
+	"let g:neocomplcache_keyword_patterns['default'] = '\h\w*'
 
-" スニペットを展開する。スニペットが関係しないところでは行末まで削除
-"imap <expr><C-k> neocomplcache#sources#snippets_complete#expandable() ? "\<Plug>(neocomplcache_snippets_expand)" : "\<C-o>D"
-"smap <expr><C-k> neocomplcache#sources#snippets_complete#expandable() ? "\<Plug>(neocomplcache_snippets_expand)" : "\<C-o>D"
+	" スニペットを展開する。スニペットが関係しないところでは行末まで削除
+	"imap <expr><C-k> neocomplcache#sources#snippets_complete#expandable() ? "\<Plug>(neocomplcache_snippets_expand)" : "\<C-o>D"
+	"smap <expr><C-k> neocomplcache#sources#snippets_complete#expandable() ? "\<Plug>(neocomplcache_snippets_expand)" : "\<C-o>D"
 
-" 前回行われた補完をキャンセルします
-inoremap <expr><C-g> neocomplcache#undo_completion()
+	" 前回行われた補完をキャンセルします
+	inoremap <expr><C-g> neocomplcache#undo_completion()
 
-" 補完候補のなかから、共通する部分を補完します
-inoremap <expr><C-l> neocomplcache#complete_common_string()
+	" 補完候補のなかから、共通する部分を補完します
+	inoremap <expr><C-l> neocomplcache#complete_common_string()
 
-" 改行で補完ウィンドウを閉じる
-"inoremap <expr><CR> neocomplcache#smart_close_popup() . "\<CR>"
+	" 改行で補完ウィンドウを閉じる
+	"inoremap <expr><CR> neocomplcache#smart_close_popup() . "\<CR>"
 
-"tabで補完候補の選択を行う
-inoremap <expr><TAB> pumvisible() ? "\<Down>" : "\<TAB>"
-inoremap <expr><S-TAB> pumvisible() ? "\<Up>" : "\<S-TAB>"
+	"tabで補完候補の選択を行う
+	inoremap <expr><TAB> pumvisible() ? "\<Down>" : "\<TAB>"
+	inoremap <expr><S-TAB> pumvisible() ? "\<Up>" : "\<S-TAB>"
 
-" <C-h>や<BS>を押したときに確実にポップアップを削除します
-"inoremap <expr><C-h> neocomplcache#smart_close_popup()."\<C-h>"
-"inoremap <expr><BS> neocomplcache#smart_close_popup()."\<C-h>"
+	" <C-h>や<BS>を押したときに確実にポップアップを削除します
+	"inoremap <expr><C-h> neocomplcache#smart_close_popup()."\<C-h>"
+	"inoremap <expr><BS> neocomplcache#smart_close_popup()."\<C-h>"
 
-" 現在選択している候補を確定します
-inoremap <expr><C-y> neocomplcache#close_popup()
+	" 現在選択している候補を確定します
+	inoremap <expr><C-y> neocomplcache#close_popup()
 
-" 現在選択している候補をキャンセルし、ポップアップを閉じます
-inoremap <expr><C-e> neocomplcache#cancel_popup()
+	" 現在選択している候補をキャンセルし、ポップアップを閉じます
+	inoremap <expr><C-e> neocomplcache#cancel_popup()
 
-" clang_completeを有効化
-let g:neocomplcache_force_overwrite_completefunc=1
+	" clang_completeを有効化
+	let g:neocomplcache_force_overwrite_completefunc=1
 
-" 現在のバッファのタグファイルを生成する
-" neocomplcache が作成した tag ファイルのパスを tags に追加する
-function! g:TagsUpdate()
-	" include している tag ファイルが毎回同じとは限らないので毎回初期化
-	setlocal tags=
-	for filename in neocomplcache#sources#include_complete#get_include_files(bufnr('%'))
-		execute "setlocal tags+=".neocomplcache#cache#encode_name('tags_output', filename)
-	endfor
-endfunction
-autocmd! BufRead *.cpp,*.h call g:TagsUpdate()
+	" 現在のバッファのタグファイルを生成する
+	" neocomplcache が作成した tag ファイルのパスを tags に追加する
+	function! g:TagsUpdate()
+		" include している tag ファイルが毎回同じとは限らないので毎回初期化
+		setlocal tags=
+		for filename in neocomplcache#sources#include_complete#get_include_files(bufnr('%'))
+			execute "setlocal tags+=".neocomplcache#cache#encode_name('tags_output', filename)
+		endfor
+	endfunction
+	autocmd! BufRead *.cpp,*.h call g:TagsUpdate()
+endif
+"}}}
+
+" neocomplete"{{{
+"-------------------------
+if neobundle#is_installed('neocomplete')
+	" 補完ウィンドウの設定
+	set completeopt=menuone
+
+	" 起動時に有効化
+	let g:neocomplete#enable_at_startup = 1
+
+	let g:neocomplete#enable_ignore_case = 1
+	let g:neocomplete#enable_smart_case = 1
+
+	if !exists('g:neocomplete#keyword_patterns')
+	    let g:neocomplete#keyword_patterns = {}
+	endif
+	let g:neocomplete#keyword_patterns._ = '\h\w*'
+
+	if !exists('g:neocomplete#sources#dictionary#dictionaries')
+	  let g:neocomplete#sources#dictionary#dictionaries = {}
+	endif
+	let dict = g:neocomplete#sources#dictionary#dictionaries
+
+	" 補完しないバッファ
+	let g:neocomplete#sources#buffer#disabled_pattern = '\.log\|\.log\.\|\.jax\|Log.txt'
+
+	" minimum
+	let g:neocomplete#sources#syntax#min_keyword_length = 3
+
+	"tabで補完候補の選択を行う
+	inoremap <expr><TAB> pumvisible() ? "\<Down>" : "\<TAB>"
+	inoremap <expr><S-TAB> pumvisible() ? "\<Up>" : "\<S-TAB>"
+
+	" Plugin key-mappings.
+	inoremap <expr><C-g>     neocomplete#undo_completion()
+	inoremap <expr><C-l>     neocomplete#complete_common_string()
+
+	" <C-h>, <BS>: close popup and delete backword char.
+	inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
+	inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
+	inoremap <expr><C-y>  neocomplete#close_popup()
+	inoremap <expr><C-e>  neocomplete#cancel_popup()
+
+	" Enable omni completion.
+	autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
+	autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+	autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+	autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
+	autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+
+	" For perlomni.vim setting.
+	" https://github.com/c9s/perlomni.vim
+	"let g:neocomplete#sources#omni#input_patterns.perl = '\h\w*->\h\w*\|\h\w*::'
+endif
 "}}}
 
 " neosnippet"{{{
@@ -735,10 +825,6 @@ nmap ,e :VimFilerCurrentDir -split -simple -winwidth=30 -no-quit<CR>
 let g:vimfiler_as_default_explorer = 1
 "表示拒否パターンを変更
 let g:vimfiler_ignore_pattern = '^\%(.svn\|.git\|.DS_Store\)$'
-"}}}
-
-" unite-outline"{{{
-"-------------------------
 "}}}
 
 " vim-airline"{{{
@@ -845,7 +931,9 @@ let g:quickrun_config["watchdogs_checker/_"] = {
 " vim-ref"{{{
 "-------------------------
 let g:ref_phpmanual_path = $HOME . '/.manual/php-chunked-xhtml'
+let g:ref_phpmanual_cmd = 'w3m -dump %s'
 autocmd FileType c,cpp let g:ref_man_cmd = "man 3"
+au FileType ref-phpmanual nnoremap <silent> <buffer> q :q<CR>
 "}}}
 
 " vim-singleton"{{{
@@ -862,10 +950,10 @@ map # <Plug>(visualstar-#)N
 " submode"{{{
 "-------------------------
 "set runtimepath^=~/.vim/bundle/vim-submode
-call submode#enter_with('changetab', 'n', '', 'gt', 'gt')
-call submode#enter_with('changetab', 'n', '', 'gT', 'gT')
-call submode#map('changetab', 'n', '', 't', 'gt')
-call submode#map('changetab', 'n', '', 'T', 'gT')
+"call submode#enter_with('changetab', 'n', '', 'gt', 'gt')
+"call submode#enter_with('changetab', 'n', '', 'gT', 'gT')
+"call submode#map('changetab', 'n', '', 't', 'gt')
+"call submode#map('changetab', 'n', '', 'T', 'gT')
 "call submode#enter_with('wintb', 'n', '', '<C-w>k', '<C-w>k')
 "call submode#enter_with('wintb', 'n', '', '<C-w>j', '<C-w>j')
 "call submode#map('wintb', 'n', '', 'k', '<C-w>k')
@@ -946,8 +1034,6 @@ let g:yankround_max_history = 50
 nnoremap <silent>,y :<C-u>CtrlPYankRound<CR>
 "}}}
 
-
-
 " OmniCppComplete"{{{
 "-------------------------
 " OmniCppComplete
@@ -1002,6 +1088,33 @@ let g:anzu_no_match_word = ""
 "\]
 "}}}
 
+" vim-marching "{{{
+"-------------------------
+let g:marching_clang_command = "/usr/bin/clang"
+
+" オプションを追加する場合
+"let g:marching_clang_command_option="-std=c++1y"
+
+" インクルードディレクトリのパスを設定
+let g:marching_include_paths = [
+\   "/usr/include/c++"
+\]
+
+" neocomplete.vim と併用して使用する場合は以下の設定を行う
+let g:marching_enable_neocomplete = 1
+
+if !exists('g:neocomplete#force_omni_input_patterns')
+  let g:neocomplete#force_omni_input_patterns = {}
+endif
+
+let g:neocomplete#force_omni_input_patterns.cpp =
+    \ '[^.[:digit:] *\t]\%(\.\|->\)\w*\|\h\w*::\w*'
+
+" バックエンドに同期版の実装を使用する
+" これ以外は非同期版と同様の設定
+let g:marching_backend = "sync_clang_command"
+"}}}
+
 " accelerated-smooth-scroll "{{{
 "-------------------------
 " <C-d>/<C-u> 時のスリープ時間 (msec) : 小さくするとスクロールが早くなります。
@@ -1011,6 +1124,152 @@ let g:ac_smooth_scroll_du_sleep_time_msec = 1
 " <C-f>/<C-b> 時のスリープ時間 (msec) : 小さくするとスクロールが早くなります。
 " Default : 10
 let g:ac_smooth_scroll_fb_sleep_time_msec = 1
+"}}}
+
+" linediff "{{{
+"-------------------------
+vmap <Space>d :Linediff<CR>
+"}}}
+
+" signify "{{{
+"-------------------------
+" 次の差分箇所に移動
+nmap ,gj <Plug>(signify-next-hunk)zz
+" 前の差分箇所に移動
+nmap ,gk <Plug>(signify-prev-hunk)zz
+" 差分箇所をハイライト
+nmap ,gh <Plug>(signify-toggle-highlight)
+" 差分表示をトグルする(:SignifyToggleコマンドと同じ)
+nmap ,gt <Plug>(signify-toggle)
+"}}}
+
+" calendar.vim "{{{
+"-------------------------
+"autocmd! FileType calendar colorscheme default
+"}}}
+
+" lightline.vim "{{{
+"-------------------------
+
+command! -bar LightlineUpdate
+\ call lightline#init()|
+\ call lightline#colorscheme()|
+\ call lightline#update()
+
+let g:lightline = {
+\	'colorscheme': 'solarized',
+\	'active': {
+\		'left': [ [ 'mode', 'paste' ], [ 'filename', 'dir', 'cfi' ] ]
+\	},
+\	'inactive': {
+\		'left': [ [ 'filename', 'dir' ] ]
+\	},
+\	'component': {
+\		'lineinfo': '%3l:%3c[%{GetB()}]',
+\		'dir'     : '%.35(%{expand("%:h:s?\\S$?\\0/?")}%)',
+\		'anzu'    : '%{anzu#search_status()}'
+\	},
+\	'component_function': {
+\		'modified':     'MyModified',
+\		'readonly':     'MyReadonly',
+\		'fugitive':     'MyFugitive',
+\		'filename':     'MyFilename',
+\		'fileformat':   'MyFileformat',
+\		'filetype':     'MyFiletype',
+\		'fileencoding': 'MyFileencoding',
+\		'mode':         'MyMode',
+\		'cfi':          'MyCurrentFuncInfo'
+\	}
+\}
+
+function! MyModified()
+	return &ft =~ 'help\|vimfiler\|gundo' ? '' : &modified ? '++++++' : &modifiable ? '' : '-'
+endfunction
+
+function! MyReadonly()
+"	return &ft !~? 'help\|vimfiler\|gundo' && &readonly ? 'x' : ''
+	return &readonly ? '[RO]' : ''
+endfunction
+
+function! MyFilename()
+	return ('' != MyReadonly() ? MyReadonly() . ' ' : '') .
+			\ (&ft == 'vimfiler' ? vimfiler#get_status_string() :
+			\  &ft == 'unite' ? unite#get_status_string() :
+			\  &ft == 'vimshell' ? vimshell#get_status_string() :
+			\ '' != expand('%:t') ? expand('%:t') : '[No Name]') .
+			\ ('' != MyModified() ? ' ' . MyModified() : '')
+endfunction
+
+function! MyFugitive()
+	try
+		if &ft !~? 'vimfiler\|gundo' && exists('*fugitive#head')
+			return fugitive#head()
+		endif
+	catch
+	endtry
+	return ''
+endfunction
+
+function! MyFileformat()
+	return winwidth(0) > 70 ? &fileformat : ''
+endfunction
+
+function! MyFiletype()
+	return winwidth(0) > 70 ? (strlen(&filetype) ? &filetype : 'no ft') : ''
+endfunction
+
+function! MyFileencoding()
+	return winwidth(0) > 70 ? (strlen(&fenc) ? &fenc : &enc) : ''
+endfunction
+
+function! MyMode()
+	return  &ft == 'unite' ? 'Unite' :
+		  \ &ft == 'vimfiler' ? 'VimFiler' :
+          \ &ft == 'vimshell' ? 'VimShell' :
+          \ winwidth(0) > 60 ? lightline#mode() : ''
+endfunction
+
+function! MyCurrentFuncInfo()
+	if exists('*cfi#format')
+		return cfi#format('%.43s()', '')
+	end
+	return ''
+endfunction
+
+
+"}}}
+
+" vim-choosewin.vim "{{{
+"-------------------------
+nmap - <Plug>(choosewin)
+
+" オーバーレイを使う
+let g:choosewin_overlay_enable = 1
+
+" マルチバイトバッファでオーバーレイフォントを崩さないように
+let g:choosewin_overlay_clear_multibyte = 1
+
+" tmux の色に雰囲気を合わせる。
+let g:choosewin_color_overlay = {
+	\ 'gui': ['DodgerBlue3', 'DodgerBlue3' ],
+	\ 'cterm': [ 25, 25 ]
+	\ }
+let g:choosewin_color_overlay_current = {
+	\ 'gui': ['firebrick1', 'firebrick1' ],
+	\ 'cterm': [ 124, 124 ]
+	\ }
+"}}}
+
+" vim-quickhl.vim "{{{
+"-------------------------
+" <Space>m でカーソル下の単語、もしくは選択した範囲のハイライトを行う
+" 再度 <Space>m を行うとカーソル下のハイライトを解除する
+" これは複数の単語のハイライトを行う事もできる
+" <Space>M で全てのハイライトを解除する
+nmap m <Plug>(quickhl-manual-this)
+xmap m <Plug>(quickhl-manual-this)
+nmap <Space>m <Plug>(quickhl-manual-reset)
+xmap <Space>m <Plug>(quickhl-manual-reset)
 "}}}
 
 " Pyclewn "{{{
