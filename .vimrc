@@ -23,6 +23,9 @@ set shiftwidth=4
 "括弧の対応表示
 set showmatch
 
+"括弧を入力した時にカーソルが移動しないように設定
+set matchtime=0
+
 "実行中のコマンド表示
 set showcmd
 
@@ -35,7 +38,7 @@ set autoread
 
 "バックアップ
 set backup
-set backupdir=~/.vimtmp
+set backupdir=$HOME/.vimtmp
 
 "hidden bufferになった際にundo等の情報が消えてしまうのを抑える
 set hidden
@@ -158,45 +161,46 @@ hi DiffText term=reverse cterm=bold ctermbg=11 gui=bold guibg=Red
 "endif"}}}
 
 "---------------------------------------------------------------------------------------
-" 便利な機能
+" au
 "---------------------------------------------------------------------------------------
 
-augroup MyAutoCmd"{{{
+augroup MyAu"{{{
 
 	" リセット
 	autocmd!
 
-	"カレントディレクトリの移動
-	autocmd BufEnter *.nut,*.sh,*.conf,*.log,*.vim,Makefile,*.txt,*.c,*.cpp,*.h,*.hpp,*.pl,*.py,*.php,*.rb,*.js,*.css,*.html,*.xml,*.xsl,*.sql,*.csv,*.tmpl,*.script,*.as,*.tpl,*.ctp,*.cs execute ":lcd " . expand("%:p:h")
-
-	" 前回終了したカーソル行に移動
-	autocmd BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | exe "normal g`\"" | endif
-
-	" :grep や :make の実行後、自動的に QuickFix ウィンドウを開く(http://vimwiki.net/?tips)
-	autocmd QuickfixCmdPost make,grep,grepadd,vimgrep copen
-	autocmd QuickfixCmdPost l* lopen
-
-	" コメント行で改行したらコメントを自動挿入をoff
-	autocmd FileType c,cpp,vim setlocal fo-=ro
-
-	" sqlの際は行の折り返しをしない
-	"autocmd FileType sql :set nowrap
-
-	" actionscriptファイル認識
-	autocmd BufNewFile,BufRead *.as set filetype=actionscript
-
-	" genshiファイル認識
-	autocmd BufNewFile,BufRead *.tmpl set filetype=textgenshi
-
-	" svnファイルはutf-8で開く
-	autocmd FileType svn setlocal fenc=utf-8
-
 augroup END"}}}
 
-" ファイルを開いたときからの差を見る(http://vimwiki.net/?tips)
-command! DiffOrig vert new | set bt=nofile
-\ | r # | 0d_ | diffthis
-\ | wincmd p | diffthis
+"カレントディレクトリの移動
+au MyAu BufEnter *.nut,*.sh,*.conf,*.log,*.vim,Makefile,*.txt,*.c,*.cpp,*.h,*.hpp,*.pl,*.py,*.php,*.rb,*.js,*.css,*.html,*.xml,*.xsl,*.sql,*.csv,*.tmpl,*.script,*.as,*.tpl,*.ctp,*.cs execute ":lcd " . expand("%:p:h")
+
+" 前回終了したカーソル行に移動
+au MyAu BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | exe "normal g`\"" | endif
+
+" :grep や :make の実行後、自動的に QuickFix ウィンドウを開く(http://vimwiki.net/?tips)
+au MyAu QuickfixCmdPost make,grep,grepadd,vimgrep copen
+au MyAu QuickfixCmdPost l* lopen
+
+" actionscriptファイル認識
+au MyAu BufNewFile,BufRead *.as set filetype=actionscript
+" genshiファイル認識
+au MyAu BufNewFile,BufRead *.tmpl set filetype=textgenshi
+
+" sqlの際は行の折り返しをしない
+"au MyAu FileType sql :set nowrap
+
+" コメント行で改行したらコメントを自動挿入をoff
+au MyAu FileType c,cpp,vim setlocal fo-=ro
+
+" svnファイルはutf-8で開く
+au MyAu FileType svn setlocal fenc=utf-8
+
+" 数値の上で実行時にVCSAnnotateをリビジョン付きで呼び出す
+au MyAu FileType svnannotate nnoremap <silent><buffer> <C-w>F :VCSAnnotate -r <C-r><C-w><CR>
+" 数値の上で実行時にVCSLogをリビジョン付きで呼び出す
+au MyAu FileType svnannotate nnoremap <silent><buffer> <C-w>L :VCSLog -r <C-r><C-w><CR>
+" 数値の上で実行時にVCSDiffをリビジョン付きで呼び出す
+au MyAu FileType svnannotate nnoremap <silent><buffer> <C-w>D :VCSDiff -c <C-r><C-w><CR>
 
 "---------------------------------------------------------------------------------------
 " key-mapping
@@ -214,7 +218,7 @@ nmap k gk
 vmap f :fold
 
 " .vimrcを再読み込み
-nmap <Space>v :source ~/.vimrc<CR>
+nmap <Space>v :source $HOME/.vimrc<CR>
 
 " 適当なショートカット
 nnoremap <Space>: :noh<CR>
@@ -258,12 +262,11 @@ nnoremap <silent> ,co :ContinuousNumber <C-a><CR>
 vnoremap <silent> ,co :ContinuousNumber <C-a><CR>
 command! -count -nargs=1 ContinuousNumber let c = col('.')|for n in range(1, <count>?<count>-line('.'):1)|exec 'normal! j' . n . <q-args>|call cursor('.', c)|endfor
 
-" 数値の上で実行時にVCSAnnotateをリビジョン付きで呼び出す
-au FileType svnannotate nnoremap <silent><buffer> <C-w>F :VCSAnnotate -r <C-r><C-w><CR>
-" 数値の上で実行時にVCSLogをリビジョン付きで呼び出す
-au FileType svnannotate nnoremap <silent><buffer> <C-w>L :VCSLog -r <C-r><C-w><CR>
-" 数値の上で実行時にVCSDiffをリビジョン付きで呼び出す
-au FileType svnannotate nnoremap <silent><buffer> <C-w>D :VCSDiff -c <C-r><C-w><CR>
+" ファイルを開いたときからの差を見る(http://vimwiki.net/?tips)
+command! DiffOrig vert new | set bt=nofile
+\ | r # | 0d_ | diffthis
+\ | wincmd p | diffthis
+
 
 "---------------------------------------------------------------------------------------
 " 文字コード関連
@@ -366,7 +369,7 @@ nnoremap <Space>1 :e ++enc=iso-2022-jp-3<CR>
 "}}}
 
 " .hと.hppを新規で開いた場合に#ifdef - #endifを挿入する
-au! BufNewFile *.h,*.hpp call IncludeGuard()
+au MyAu BufNewFile *.h,*.hpp call IncludeGuard()
 function! IncludeGuard()"{{{
    let fl = getline(1)
    if fl =~ "^#if"
@@ -480,8 +483,8 @@ endfunction"}}}
 " doxygencommenter.vim設定
 " jcommenter.vimをdoxygen形式に改造
 "-------------------------
-autocmd FileType c,cpp map <Space>/ :call DoxygenCommentWriter()<CR>
-autocmd FileType c,cpp vmap <Space>/ :Align //!<<CR>
+au MyAu FileType c,cpp map <Space>/ :call DoxygenCommentWriter()<CR>
+au MyAu FileType c,cpp vmap <Space>/ :Align //!<<CR>
 let g:doxycommenter_file_author = "B.Naka"
 nnoremap <Space>,, f)l<S-D>:call DoxygenCommentWriter()<CR><ESC><ESC>p0f;df<Space>2jo{<CR>}<ESC>k
 
@@ -489,25 +492,35 @@ nnoremap <Space>,, f)l<S-D>:call DoxygenCommentWriter()<CR><ESC><ESC>p0f;df<Spac
 " NeoBundle.vim
 "-------------------------
 " setup neobundle
-" $ mkdir -p ~/.vim/bundle
-" $ git clone git://github.com/Shougo/neobundle.vim ~/.vim/bundle/neobundle.vim
-set nocompatible               " Be iMproved
+" $ mkdir -p $HOME/.vim/bundle
+" $ git clone git://github.com/Shougo/neobundle.vim $HOME/.vim/bundle/neobundle.vim
 
 " proxy
 let g:neobundle_default_git_protocol='https'
 
 if has('vim_starting')
-  set runtimepath+=~/.vim/bundle/neobundle.vim/
+	set nocompatible
+	set runtimepath+=$HOME/.vim/bundle/neobundle.vim/
 endif
-call neobundle#rc(expand('~/.vim/bundle/'))
+call neobundle#rc(expand('$HOME/.vim/bundle/'))
 
 " Let NeoBundle manage NeoBundle
 NeoBundleFetch 'Shougo/neobundle.vim'
 
 " Recommended to install
-" After install, turn shell ~/.vim/bundle/vimproc, (n,g)make -f
+" After install, turn shell $HOME/.vim/bundle/vimproc, (n,g)make -f
 " your_machines_makefile
-NeoBundle 'Shougo/vimproc'
+
+if !has("kaoriya")
+	NeoBundle 'Shougo/vimproc.vim', {
+		\ 'build' : {
+		\ 'windows' : 'make -f make_mingw32.mak',
+		\ 'cygwin' : 'make -f make_cygwin.mak',
+		\ 'mac' : 'make -f make_mac.mak',
+		\ 'unix' : 'make -f make_unix.mak',
+		\ },
+	\ }
+endif
 
 " My Bundle
 NeoBundle 'Shougo/unite.vim'
@@ -544,16 +557,17 @@ NeoBundle 'thinca/vim-visualstar'
 
 NeoBundle 'kana/vim-submode'
 NeoBundle 'kana/vim-textobj-user'
+NeoBundle 'osyo-manga/vim-textobj-multiblock'
 NeoBundle 'kana/vim-smartchr'
 NeoBundle 'kana/vim-smartinput'
 NeoBundle 'cohama/vim-smartinput-endwise'
+NeoBundle 'kana/vim-altr'
 
 NeoBundle 'tyru/capture.vim'
 NeoBundle 'tyru/caw.vim'
 NeoBundle 'tyru/current-func-info.vim'
 
 NeoBundle 'osyo-manga/vim-precious'
-NeoBundle 'osyo-manga/vim-textobj-multiblock'
 NeoBundle 'osyo-manga/vim-anzu'
 NeoBundle 'osyo-manga/vim-automatic'
 NeoBundle 'osyo-manga/vim-fancy'
@@ -578,7 +592,7 @@ NeoBundle 'tomtom/tcomment_vim'
 NeoBundle 'rhysd/clever-f.vim'
 "NeoBundle 'supermomonga/vimshell-kawaii'
 NeoBundle 'gregsexton/VimCalc'
-NeoBundle 'yonchu/accelerated-smooth-scroll'
+"NeoBundle 'yonchu/accelerated-smooth-scroll'
 NeoBundle 'deris/vim-rengbang'
 NeoBundle 'LeafCage/yankround.vim'
 NeoBundle 'terryma/vim-expand-region'
@@ -590,16 +604,17 @@ NeoBundle 'cocopon/colorswatch.vim'
 NeoBundle 'vim-jp/vimdoc-ja'
 
 NeoBundle 'vim-scripts/Align'
-"NeoBundle 'vim-scripts/YankRing.vim'
-NeoBundle 'vim-scripts/a.vim'
+"NeoBundle 'vim-scripts/YankRing.vim' => yankround.vim
+"NeoBundle 'vim-scripts/a.vim' => vim-altr
 NeoBundle 'vim-scripts/vcscommand.vim'
 NeoBundle 'vim-scripts/OmniCppComplete'
 
 " Installation check.
 NeoBundleCheck
 
-"ソースコードのハイライト
-syntax on
+"ファイルタイプインデントを戻す
+filetype plugin indent on
+syntax enable
 
 " unite.vim"{{{
 "-------------------------
@@ -608,7 +623,7 @@ let g:unite_enable_start_insert=1
 " 表示場所
 let g:unite_split_rule="lefta"
 " file_mru表示数
-let g:unite_source_file_mru_limit=200
+let g:unite_source_file_mru_limit=3000
 
 " バッファ一覧
 nnoremap <silent> ,ub :<C-u>Unite buffer<CR>
@@ -633,14 +648,14 @@ nmap <silent> <Space>e :silent! UniteWithBufferDir file_mru:long<CR>
 call unite#custom#source('file,file/new,buffer,file_rec,file_mru,tag,tag/include', 'matchers', 'matcher_fuzzy')
 
 " ウィンドウを分割して開く
-au FileType unite nnoremap <silent> <buffer> <expr> <C-w>S unite#do_action('split')
-au FileType unite inoremap <silent> <buffer> <expr> <C-w>S unite#do_action('split')
+au MyAu FileType unite nnoremap <silent> <buffer> <expr> <C-w>S unite#do_action('split')
+au MyAu FileType unite inoremap <silent> <buffer> <expr> <C-w>S unite#do_action('split')
 " ウィンドウを縦に分割して開く
-au FileType unite nnoremap <silent> <buffer> <expr> <C-w>V unite#do_action('vsplit')
-au FileType unite inoremap <silent> <buffer> <expr> <C-w>V unite#do_action('vsplit')
+au MyAu FileType unite nnoremap <silent> <buffer> <expr> <C-w>V unite#do_action('vsplit')
+au MyAu FileType unite inoremap <silent> <buffer> <expr> <C-w>V unite#do_action('vsplit')
 " ESCキーを2回押すと終了する
-au FileType unite nnoremap <silent> <buffer> <ESC><ESC> :q<CR>
-au FileType unite inoremap <silent> <buffer> <ESC><ESC> <ESC>:q<CR>
+au MyAu FileType unite nnoremap <silent> <buffer> <ESC><ESC> :q<CR>
+au MyAu FileType unite inoremap <silent> <buffer> <ESC><ESC> <ESC>:q<CR>
 
 " ファイル内検索
 nnoremap <silent> ,/ :<C-u>Unite -buffer-name=search line/fast -start-insert -no-quit<CR>
@@ -742,7 +757,7 @@ if neobundle#is_installed('neocomplcache')
 			execute "setlocal tags+=".neocomplcache#cache#encode_name('tags_output', filename)
 		endfor
 	endfunction
-	autocmd! BufRead *.cpp,*.h call g:TagsUpdate()
+	au MyAu BufRead *.cpp,*.h call g:TagsUpdate()
 endif
 "}}}
 
@@ -789,11 +804,11 @@ if neobundle#is_installed('neocomplete')
 	inoremap <expr><C-e>  neocomplete#cancel_popup()
 
 	" Enable omni completion.
-	autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
-	autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-	autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-	autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
-	autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+	au MyAu FileType css setlocal omnifunc=csscomplete#CompleteCSS
+	au MyAu FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+	au MyAu FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+	au MyAu FileType python setlocal omnifunc=pythoncomplete#Complete
+	au MyAu FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
 
 	" For perlomni.vim setting.
 	" https://github.com/c9s/perlomni.vim
@@ -806,15 +821,25 @@ endif
 " Plugin key-mappings.
 imap <C-k>     <Plug>(neosnippet_expand_or_jump)
 smap <C-k>     <Plug>(neosnippet_expand_or_jump)
+xmap <C-k>     <Plug>(neosnippet_expand_target)
+xmap <C-l>     <Plug>(neosnippet_start_unite_snippet_target)
 
 " SuperTab like snippets behavior.
-imap <expr><TAB> neosnippet#expandable_or_jumpable() ? "\<Plug>(neosnippet_expand_or_jump)" : pumvisible() ? "\<C-n>" : "\<TAB>"
-smap <expr><TAB> neosnippet#expandable_or_jumpable() ? "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
+"imap <expr><TAB> neosnippet#expandable_or_jumpable() ? "\<Plug>(neosnippet_expand_or_jump)" : pumvisible() ? "\<C-n>" : "\<TAB>"
+"smap <expr><TAB> neosnippet#expandable_or_jumpable() ? "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
 
 " For snippet_complete marker.
 if has('conceal')
   set conceallevel=2 concealcursor=i
 endif
+
+" 現在の filetype のスニペットを編集する為のキーマッピング
+" こうしておくことでサッと編集や追加などを行うことができる
+" 以下の設定では新しいタブでスニペットファイルを開く
+nnoremap <Space>ns :execute "tabnew\|:NeoSnippetEdit ".&filetype<CR>
+
+" スニペットファイルの保存ディレクトリを設定
+let g:neosnippet#snippets_directory = "$HOME/.neosnippet"
 "}}}
 
 " vimfiler"{{{
@@ -840,7 +865,7 @@ let g:airline_detect_whitespace = 2
 
 " ctrlp.vim"{{{
 "-------------------------
-"set runtimepath^=~/.vim/bundle/ctrlp.vim
+"set runtimepath^=$HOME/.vim/bundle/ctrlp.vim
 let g:ctrlp_open_new_file = 'h'
 let g:ctrlp_user_command = 'find %s \( -path "*.svn" -prune -or -name "*.o" -prune \) -o -print'
 set wildignore+=*.o,*.swp
@@ -851,9 +876,10 @@ let g:ctrlp_map = '<Space>p'
 
 " vim-quickrun"{{{
 "-------------------------
-"set runtimepath^=~/.vim/bundle/vim-quickrun
+"set runtimepath^=$HOME/.vim/bundle/vim-quickrun
 "nmap <Space>r :QuickRun -outputter error -outputter/error/success buffer -outputter/error quickfix<CR>
 nmap <Space>r :QuickRun -args <C-r>r<CR>
+vmap <Space>r :QuickRun -args <C-r>r<CR>
 vmap ,r "ry<Space>r
 nmap ,r qrq
 " <C-c> で実行を強制終了させる
@@ -932,8 +958,8 @@ let g:quickrun_config["watchdogs_checker/_"] = {
 "-------------------------
 let g:ref_phpmanual_path = $HOME . '/.manual/php-chunked-xhtml'
 let g:ref_phpmanual_cmd = 'w3m -dump %s'
-autocmd FileType c,cpp let g:ref_man_cmd = "man 3"
-au FileType ref-phpmanual nnoremap <silent> <buffer> q :q<CR>
+au MyAu FileType c,cpp let g:ref_man_cmd = "man 3"
+au MyAu FileType ref-phpmanual nnoremap <silent> <buffer> q :q<CR>
 "}}}
 
 " vim-singleton"{{{
@@ -949,7 +975,7 @@ map # <Plug>(visualstar-#)N
 
 " submode"{{{
 "-------------------------
-"set runtimepath^=~/.vim/bundle/vim-submode
+"set runtimepath^=$HOME/.vim/bundle/vim-submode
 "call submode#enter_with('changetab', 'n', '', 'gt', 'gt')
 "call submode#enter_with('changetab', 'n', '', 'gT', 'gT')
 "call submode#map('changetab', 'n', '', 't', 'gt')
@@ -962,7 +988,7 @@ map # <Plug>(visualstar-#)N
 
 " vim-hier"{{{
 "-------------------------
-"set runtimepath^=~/.vim/bundle/vim-hier
+"set runtimepath^=$/.vim/bundle/vim-hier
 
 " エラーを赤字の波線で
 "execute "highlight qf_error_ucurl gui=bold guisp=Red"
@@ -975,8 +1001,8 @@ let g:hier_highlight_group_qf  = "SpellLocal"
 
 " memolist.vim"{{{
 "-------------------------
-"set runtimepath^=~/.vim/bundle/memolist.vim
-let g:memolist_path = "~/.memolist/"
+"set runtimepath^=$HOME/.vim/bundle/memolist.vim
+let g:memolist_path = "$HOME/.memolist/"
 nmap <C-w>n :MemoNew<CR>
 "}}}
 
@@ -1025,13 +1051,15 @@ vmap A :Align
 
 "yankround.vim{{{
 "-------------------------
-nmap p <Plug>(yankround-p)
-nmap P <Plug>(yankround-P)
-nmap ,p <Plug>(yankround-prev)
-nmap ,n <Plug>(yankround-next)
-let g:yankround_max_history = 50
-"let g:yankround_dir = '~/.cache/yankround'
-nnoremap <silent>,y :<C-u>CtrlPYankRound<CR>
+if neobundle#is_installed('yankround.vim')
+	nmap p <Plug>(yankround-p)
+	nmap P <Plug>(yankround-P)
+	nmap ,p <Plug>(yankround-prev)
+	nmap ,n <Plug>(yankround-next)
+	let g:yankround_max_history = 50
+	"let g:yankround_dir = '$HOME/.cache/yankround'
+	nnoremap <silent>,y :<C-u>CtrlPYankRound<CR>
+endif
 "}}}
 
 " OmniCppComplete"{{{
@@ -1064,6 +1092,15 @@ vmap ib <Plug>(textobj-multiblock-i)
 "-------------------------
 call smartinput_endwise#define_default_rules()
 "}}}
+
+" vim-altr"{{{
+"-------------------------
+" a.vimになれてるので:Aでaltrする
+command! A  call altr#forward()
+" tmplに対するルールを指定
+call altr#define('%.cpp.tmpl', '%.h.tmpl', '%.hpp.tmpl', '%.c.tmpl')
+"}}}
+
 
 " vim-anzu"{{{
 "-------------------------
@@ -1117,13 +1154,15 @@ let g:marching_backend = "sync_clang_command"
 
 " accelerated-smooth-scroll "{{{
 "-------------------------
-" <C-d>/<C-u> 時のスリープ時間 (msec) : 小さくするとスクロールが早くなります。
-" Default : 10
-let g:ac_smooth_scroll_du_sleep_time_msec = 1
+if neobundle#is_installed('accelerated-smooth-scroll.vim')
+	" <C-d>/<C-u> 時のスリープ時間 (msec) : 小さくするとスクロールが早くなります。
+	" Default : 10
+	let g:ac_smooth_scroll_du_sleep_time_msec = 1
 
-" <C-f>/<C-b> 時のスリープ時間 (msec) : 小さくするとスクロールが早くなります。
-" Default : 10
-let g:ac_smooth_scroll_fb_sleep_time_msec = 1
+	" <C-f>/<C-b> 時のスリープ時間 (msec) : 小さくするとスクロールが早くなります。
+	" Default : 10
+	let g:ac_smooth_scroll_fb_sleep_time_msec = 1
+endif
 "}}}
 
 " linediff "{{{
@@ -1145,7 +1184,7 @@ nmap ,gt <Plug>(signify-toggle)
 
 " calendar.vim "{{{
 "-------------------------
-"autocmd! FileType calendar colorscheme default
+"au MyAu FileType calendar colorscheme default
 "}}}
 
 " lightline.vim "{{{
@@ -1159,10 +1198,10 @@ command! -bar LightlineUpdate
 let g:lightline = {
 \	'colorscheme': 'solarized',
 \	'active': {
-\		'left': [ [ 'mode', 'paste' ], [ 'filename', 'dir', 'cfi' ] ]
+\		'left': [ [ 'mode', 'paste' ], [ 'dir', 'filename', 'cfi' ] ]
 \	},
 \	'inactive': {
-\		'left': [ [ 'filename', 'dir' ] ]
+\		'left': [ [ 'dir', 'filename' ] ]
 \	},
 \	'component': {
 \		'lineinfo': '%3l:%3c[%{GetB()}]',
@@ -1215,7 +1254,7 @@ function! MyFileformat()
 endfunction
 
 function! MyFiletype()
-	return winwidth(0) > 70 ? (strlen(&filetype) ? &filetype : 'no ft') : ''
+	return winwidth(0) > 70 ? (strlen(&ft) ? &ft : 'no ft') : ''
 endfunction
 
 function! MyFileencoding()
@@ -1230,34 +1269,42 @@ function! MyMode()
 endfunction
 
 function! MyCurrentFuncInfo()
-	if exists('*cfi#format')
+	"class内だと異様に重いので.hは無視する
+	if expand("%:e") == 'h'
+		return ''
+	elseif exists('*cfi#get_func_name') && (&ft == 'c' || &ft == 'cpp')
+		let fname = cfi#get_func_name('c')
+		return fname != '' ? fname . '()' : ''
+	elseif exists('*cfi#format')
 		return cfi#format('%.43s()', '')
-	end
+	endif
 	return ''
 endfunction
 
 
 "}}}
 
-" vim-choosewin.vim "{{{
+" vim-choosewin "{{{
 "-------------------------
-nmap - <Plug>(choosewin)
+if neobundle#is_installed('vim-choosewin')
+	nmap W <Plug>(choosewin)
 
-" オーバーレイを使う
-let g:choosewin_overlay_enable = 1
+	" オーバーレイを使う
+	let g:choosewin_overlay_enable = 1
 
-" マルチバイトバッファでオーバーレイフォントを崩さないように
-let g:choosewin_overlay_clear_multibyte = 1
+	" マルチバイトバッファでオーバーレイフォントを崩さないように
+	let g:choosewin_overlay_clear_multibyte = 1
 
-" tmux の色に雰囲気を合わせる。
-let g:choosewin_color_overlay = {
-	\ 'gui': ['DodgerBlue3', 'DodgerBlue3' ],
-	\ 'cterm': [ 25, 25 ]
-	\ }
-let g:choosewin_color_overlay_current = {
-	\ 'gui': ['firebrick1', 'firebrick1' ],
-	\ 'cterm': [ 124, 124 ]
-	\ }
+	" tmux の色に雰囲気を合わせる。
+	let g:choosewin_color_overlay = {
+		\ 'gui': ['DodgerBlue3', 'DodgerBlue3' ],
+		\ 'cterm': [ 25, 25 ]
+		\ }
+	let g:choosewin_color_overlay_current = {
+		\ 'gui': ['firebrick1', 'firebrick1' ],
+		\ 'cterm': [ 124, 124 ]
+		\ }
+endif
 "}}}
 
 " vim-quickhl.vim "{{{
@@ -1270,6 +1317,24 @@ nmap m <Plug>(quickhl-manual-this)
 xmap m <Plug>(quickhl-manual-this)
 nmap <Space>m <Plug>(quickhl-manual-reset)
 xmap <Space>m <Plug>(quickhl-manual-reset)
+"}}}
+
+" a.vim "{{{
+"-------------------------
+if neobundle#is_installed('a.vim')
+	" 移動対象のウィンドウ開いているとそちらに移動してしまう
+	" 強制的にhやcppにカレントウィンドウで移動するコマンドを定義
+	command! -bang AH call AlternateFile("n<bang>", 'h')
+	command! -bang AC call AlternateFile("n<bang>", 'cpp')
+
+	" hの優先度を変更
+	let g:alternateExtensions_h = 'cpp,c,cxx,cc,CC'
+	" tmpl同士の移動
+	" vim6から変数名にdotを使えなくなった
+	"let g:alternateExtensions_{'h.tmpl'}   = 'cpp.tmpl,c.tmpl,cxx.tmpl,cc.tmpl,CC.tmpl'
+	"let g:alternateExtensions_{'c.tmpl'}   = 'h.tmpl'
+	"let g:alternateExtensions_{'cpp.tmpl'} = 'h.tmpl,hpp.tmpl'
+endif
 "}}}
 
 " Pyclewn "{{{
