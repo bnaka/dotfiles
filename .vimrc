@@ -584,7 +584,7 @@ NeoBundle 't9md/vim-choosewin'
 NeoBundle 'itchyny/lightline.vim'
 
 NeoBundle 'kien/ctrlp.vim'
-NeoBundle 'glidenote/memolist.vim'
+"NeoBundle 'glidenote/memolist.vim'
 NeoBundle 'modsound/gips-vim'
 "NeoBundle 'Rip-Rip/clang_complete'
 "NeoBundle 'othree/eregex.vim'
@@ -969,8 +969,10 @@ au MyAu FileType ref-phpmanual nnoremap <silent> <buffer> q :q<CR>
 
 " vim-visualstar"{{{
 "-------------------------
-map * <Plug>(visualstar-*)N
-map # <Plug>(visualstar-#)N
+if neobundle#is_installed('vim-visualstar')
+	map * <Plug>(visualstar-*)N
+	map # <Plug>(visualstar-#)N
+endif
 "}}}
 
 " submode"{{{
@@ -1001,9 +1003,11 @@ let g:hier_highlight_group_qf  = "SpellLocal"
 
 " memolist.vim"{{{
 "-------------------------
-"set runtimepath^=$HOME/.vim/bundle/memolist.vim
-let g:memolist_path = "$HOME/.memolist/"
-nmap <C-w>n :MemoNew<CR>
+if neobundle#is_installed('memolist.vim')
+	"set runtimepath^=$HOME/.vim/bundle/memolist.vim
+	let g:memolist_path = "$HOME/.memolist/"
+	nmap <C-w>n :MemoNew<CR>
+endif
 "}}}
 
 " VimShell"{{{
