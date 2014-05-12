@@ -607,7 +607,6 @@ NeoBundle 'itchyny/calendar.vim'
 NeoBundle 'cocopon/colorswatch.vim'
 NeoBundle 'vim-jp/vimdoc-ja'
 NeoBundle 'dyng/ctrlsf.vim'
-NeoBundle 'gcmt/wildfire.vim'
 
 NeoBundle 'vim-scripts/Align'
 "NeoBundle 'vim-scripts/YankRing.vim' => yankround.vim
@@ -1054,7 +1053,7 @@ if neobundle#is_installed('vimshell')
 	nmap <silent> <Space>s :VimShellPop<CR>
 
 	"let g:vimshell_user_prompt = 'fnamemodify(getcwd(), ":~")'
-	"let g:vimshell_right_prompt = 'vcs#info("(%s)-[%b]", "(%s)-[%b|%a]")'
+	let g:vimshell_right_prompt = 'vcs#info("(%s)-[%b]", "(%s)-[%b|%a]")'
 	
 	if has('win32') || has('win64')
 	  " Display user name on Windows.
@@ -1077,11 +1076,11 @@ if neobundle#is_installed('vimshell')
 	\| call vimshell#altercmd#define('i', 'iexe')
 	\| call vimshell#altercmd#define('l', 'll')
 	\| call vimshell#altercmd#define('ll', 'ls -l')
-	"\| call vimshell#hook#add('chpwd', 'my_chpwd', 'g:my_chpwd')
+	\| call vimshell#hook#add('chpwd', 'my_chpwd', 'g:my_chpwd')
 	
-	"function! g:my_chpwd(args, context)
-	"  call vimshell#execute('ls')
-	"endfunction
+	function! g:my_chpwd(args, context)
+	  call vimshell#execute('ls')
+	endfunction
 	
 	autocmd FileType int-* call s:interactive_settings()
 	function! s:interactive_settings()
@@ -1307,14 +1306,6 @@ if neobundle#is_installed('calendar.vim')
 endif
 "}}}
 
-" wildfire.vim "{{{
-"-------------------------
-if neobundle#is_installed('wildfire.vim')
-    let g:wildfire_fuel_map = "r"
-    let g:wildfire_water_map = "R"
-endif
-"}}}
-
 " lightline.vim "{{{
 "-------------------------
 if neobundle#is_installed('lightline.vim')
@@ -1403,41 +1394,20 @@ if neobundle#is_installed('lightline.vim')
 			  \ winwidth(0) > 60 ? lightline#mode() : ''
 	endfunction
 
-	let g:lightline_my_cfi_cache = 'mycfi...'
-	let g:lightline_my_cfi_cache_line = 0
-
 	function! MyCurrentFuncInfo()
-
-		" callされまくって重い対策
-		" 関数名を探すのはかなり移動したときだけで良いはず
-		" 画面に見えてる場合は意味無いので
-		" cacheするタイミングで関数が無いこともあるので、有る場合のみcacheを使う
-		" ただし、行移動してないときは何度もする必要ないので基本cacheを使う
-		let border = 30
-		let now_line = line(".")
-		let chg_line = abs(now_line - g:lightline_my_cfi_cache_line)
-		if( chg_line < border && g:lightline_my_cfi_cache != '' )
-			return g:lightline_my_cfi_cache
-		endif
-		if( now_line == g:lightline_my_cfi_cache_line )
-			return g:lightline_my_cfi_cache
-		endif
-		let g:lightline_my_cfi_cache_line = now_line
-
-		" ruby
-		"if( &ft == 'ruby' )
-		"	return ''
-		"endif
-
-		" ファイルが読めなければ行わない
 		let fname = expand('%')
 		if !filereadable(fname)
+			return ''
+		endif
+		" ruby
+		if( &ft == 'ruby' )
 			return ''
 		endif
 
 		"下のほうに関数を書こうとするとvimが止まる対策
 		let lines = readfile(fname)
 		let max_line = len(lines)
+		let now_line = line(".")
 		if( now_line+10 > max_line )
 			return now_line . "/" . max_line
 		endif
@@ -1447,11 +1417,9 @@ if neobundle#is_installed('lightline.vim')
 			return ''
 		elseif exists('*cfi#get_func_name') && (&ft == 'c' || &ft == 'cpp')
 			let fname = cfi#get_func_name('c')
-			let g:lightline_my_cfi_cache = (fname != '') ? fname . '()' : ''
-			return g:lightline_my_cfi_cache
+			return fname != '' ? fname . '()' : ''
 		elseif exists('*cfi#format')
-			let g:lightline_my_cfi_cache = cfi#format('%.43s()', '')
-			return g:lightline_my_cfi_cache
+			return cfi#format('%.43s()', '')
 		endif
 		return ''
 	endfunction
