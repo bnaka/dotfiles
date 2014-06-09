@@ -560,10 +560,12 @@ NeoBundle 'thinca/vim-splash'
 "NeoBundle 'thinca/vim-singleton'
 NeoBundle 'thinca/vim-localrc'
 NeoBundle 'thinca/vim-visualstar'
+NeoBundle 'thinca/vim-qfreplace'
 
 NeoBundle 'kana/vim-submode'
 NeoBundle 'kana/vim-textobj-user'
 NeoBundle 'osyo-manga/vim-textobj-multiblock'
+NeoBundle 'osyo-manga/vim-textobj-blockwise'
 NeoBundle 'kana/vim-smartchr'
 NeoBundle 'kana/vim-smartinput'
 NeoBundle 'cohama/vim-smartinput-endwise'
@@ -580,6 +582,7 @@ NeoBundle 'osyo-manga/vim-fancy'
 NeoBundle 'osyo-manga/vim-over'
 NeoBundle 'osyo-manga/vim-stargate'
 NeoBundle 'osyo-manga/vim-marching'
+NeoBundle 'osyo-manga/vim-operator-blockwise'
 
 NeoBundle 't9md/vim-quickhl'
 NeoBundle 't9md/vim-choosewin'
@@ -610,6 +613,7 @@ NeoBundle 'cocopon/colorswatch.vim'
 NeoBundle 'vim-jp/vimdoc-ja'
 NeoBundle 'dyng/ctrlsf.vim'
 NeoBundle 'gcmt/wildfire.vim'
+NeoBundle 'rbtnn/rabbit-ui.vim'
 
 NeoBundle 'vim-scripts/Align'
 "NeoBundle 'vim-scripts/YankRing.vim' => yankround.vim
@@ -942,6 +946,17 @@ if neobundle#is_installed('vim-quickrun')
 	\		"hook/hier_update/priority_exit" : 1,
 	\	},
 	\	"make" :{ "type" : "cpp/make" },
+	\
+	\	"javascript" :{ "type" : "js/node" },
+	\	"jp/node" : {
+	\		"exec" : "node",
+	\		"outputter" : "multi",
+	\		"outputter/multi/targets" : ["quickfix","buffer"],
+	\		"hook/close_buffer/enable_exit" : 1,
+	\		"hook/close_quickfix/enable_exit" : 0,
+	\		"hook/copen/enable_failure" : 1,
+	\		"hook/hier_update/priority_exit" : 1,
+	\	},
 	\}
 endif
 "}}}
@@ -1314,6 +1329,19 @@ endif
 if neobundle#is_installed('wildfire.vim')
     let g:wildfire_fuel_map = "<Space>a"
     let g:wildfire_water_map = "<Space>A"
+endif
+"}}}
+
+" rabbit-ui.vim "{{{
+"-------------------------
+if neobundle#is_installed('rabbit-ui.vim')
+	function! s:edit_csv(path)
+	  call writefile(map(rabbit_ui#gridview(
+			\ map(readfile(expand(a:path)),'split(v:val,",",1)')),
+			\ "join(v:val, ',')"), expand(a:path))
+	endfunction
+
+	command! -nargs=1 -complete=file EditCSV  :call <sid>edit_csv(<q-args>)
 endif
 "}}}
 
