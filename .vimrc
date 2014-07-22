@@ -527,7 +527,7 @@ if !has("kaoriya")
 	\ }
 endif
 
-" My Bundle
+" My Bundle {{{
 NeoBundle 'Shougo/unite.vim'
 NeoBundle 'Shougo/neomru.vim'
 NeoBundle 'Shougo/unite-build'
@@ -592,7 +592,7 @@ NeoBundle 't9md/vim-choosewin'
 "NeoBundle 'bling/vim-airline'
 NeoBundle 'itchyny/lightline.vim'
 
-NeoBundle 'kien/ctrlp.vim'
+"NeoBundle 'kien/ctrlp.vim'
 "NeoBundle 'glidenote/memolist.vim'
 NeoBundle 'modsound/gips-vim'
 "NeoBundle 'Rip-Rip/clang_complete'
@@ -610,17 +610,19 @@ NeoBundle 'AndrewRadev/switch.vim'
 NeoBundle 'mhinz/vim-signify'
 NeoBundle 'itchyny/calendar.vim'
 NeoBundle 'cocopon/colorswatch.vim'
-NeoBundle 'vim-jp/vimdoc-ja'
 NeoBundle 'dyng/ctrlsf.vim'
 NeoBundle 'gcmt/wildfire.vim'
-NeoBundle 'rbtnn/rabbit-ui.vim'
+"NeoBundle 'rbtnn/rabbit-ui.vim'
+"NeoBundle 'jaxbot/semantic-highlight.vim'
 
+NeoBundle 'vim-jp/vimdoc-ja'
 NeoBundle 'vim-scripts/Align'
 "NeoBundle 'vim-scripts/YankRing.vim' => yankround.vim
 "NeoBundle 'vim-scripts/a.vim' => vim-altr
 NeoBundle 'vim-scripts/vcscommand.vim'
 NeoBundle 'vim-scripts/OmniCppComplete'
 NeoBundle 'vim-scripts/svn-diff.vim'
+" }}}
 
 " Installation check.
 NeoBundleCheck
@@ -697,6 +699,9 @@ endif
 "-------------------------
 if neobundle#is_installed('unite-tag')
 	nnoremap <silent> g<C-]> :<C-u>execute "Unite tag/include:".expand('<cword>')<CR>
+
+	" ショートカット
+	nmap <silent> <Space>t :silent! Unite -default-action=split tag<CR>
 endif
 "}}}
 
