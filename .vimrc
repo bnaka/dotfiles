@@ -45,7 +45,7 @@ set hidden
 
 "ウィンドウの大きさ
 set winwidth=105
-set winheight=70
+set winheight=50
 set winminwidth=10
 set winminheight=3
 
@@ -71,6 +71,10 @@ set nrformats-=octal
 " コメント行で改行したらコメントを自動挿入をoff
 set formatoptions-=ro
 
+" クリップボード共有
+if has("clipboard")
+	set clipboard+=unnamed,autoselect
+endif
 
 "---------------------------------------------------------------------------------------
 " 表示関連
@@ -78,6 +82,9 @@ set formatoptions-=ro
 
 "行数表示
 set number
+
+"１行が長い際に@で省略させない
+set display=lastline
 
 "タブラインを常に表示
 set showtabline=2
@@ -178,7 +185,7 @@ augroup MyAu"{{{
 augroup END"}}}
 
 "カレントディレクトリの移動
-au MyAu BufEnter *.nut,*.sh,*.conf,*.log,*.vim,Makefile,*.txt,*.c,*.cpp,*.h,*.hpp,*.pl,*.py,*.php,*.rb,*.js,*.css,*.html,*.xml,*.xsl,*.sql,*.csv,*.tmpl,*.script,*.as,*.tpl,*.ctp,*.cs,Capfile execute ":lcd " . expand("%:p:h")
+au MyAu BufEnter *.nut,*.sh,*.conf,*.log,*.vim,Makefile,*.txt,*.c,*.cpp,*.h,*.hpp,*.pl,*.py,*.php,*.rb,*.js,*.css,*.html,*.phtml,*.xml,*.xsl,*.sql,*.ddl,*.csv,*.tmpl,*.script,*.as,*.tpl,*.ctp,*.cs,Capfile,*.json execute ":lcd " . expand("%:p:h")
 
 " 前回終了したカーソル行に移動
 au MyAu BufReadPost * if !&diff && line("'\"") > 0 && line("'\"") <= line("$") | exe "normal g`\"" | endif
@@ -193,6 +200,8 @@ au MyAu BufNewFile,BufRead *.as set filetype=actionscript
 au MyAu BufNewFile,BufRead *.tmpl set filetype=textgenshi
 " capfile ファイル認識
 au MyAu BufNewFile,BufRead Capfile,capfile set filetype=ruby
+" ddl ファイル認識
+au MyAu BufNewFile,BufRead *.ddl set filetype=sql
 
 " sqlの際は行の折り返しをしない
 "au MyAu FileType sql :set nowrap
@@ -203,6 +212,7 @@ au MyAu FileType svn setlocal fenc=utf-8
 " gitcommit時に自動でDiffGitCachedを呼ぶ
 au MyAu FileType gitcommit nmap D :DiffGitCached\|wincmd J<CR>
 au MyAu FileType gitcommit setlocal winheight=50
+au MyAu FileType gitcommit setlocal fenc=utf-8
 
 " コメント行で改行したらコメントを自動挿入をoff
 au MyAu FileType cpp set formatoptions-=ro
@@ -210,6 +220,9 @@ au MyAu FileType cpp set formatoptions-=ro
 "---------------------------------------------------------------------------------------
 " key-mapping
 "---------------------------------------------------------------------------------------
+
+" 行末までヤンク
+nnoremap Y y$
 
 "wrapした行内の移動
 vmap j gj
@@ -232,9 +245,9 @@ nmap <Space>d :diffthis<CR>
 nmap <Space>c :q<CR>
 
 "カーソル位置の単語検索
-nmap <C-g><C-w> :grep "<C-R><C-W>" *.c *.cpp */*.cpp *.h */*.h *.hpp *.php *.rb *.html *.js *.as *.sql *.csv *.xml *.txt *.nut *.sh<CR>
-nmap <C-g><C-a> :grep "<C-R><C-A>" *.c *.cpp */*.cpp *.h */*.h *.hpp *.php *.rb *.html *.js *.as *.sql *.csv *.xml *.txt *.nut *.sh<CR>
-nmap <C-g><C-i> :grep "<C-R>/" *.c *.cpp */*.cpp *.h */*.h *.hpp *.php *.rb *.html *.js *.as *.sql *.csv *.xml *.txt *.nut *.sh<CR>
+nmap <C-g><C-w> :grep "<C-R><C-W>" *.c *.cpp */*.cpp *.h */*.h *.hpp *.php *.rb *.html *.js *.as *.sql *.ddl *.csv *.xml *.txt *.nut *.sh<CR>
+nmap <C-g><C-a> :grep "<C-R><C-A>" *.c *.cpp */*.cpp *.h */*.h *.hpp *.php *.rb *.html *.js *.as *.sql *.ddl *.csv *.xml *.txt *.nut *.sh<CR>
+nmap <C-g><C-i> :grep "<C-R>/" *.c *.cpp */*.cpp *.h */*.h *.hpp *.php *.rb *.html *.js *.as *.sql *.ddl *.csv *.xml *.txt *.nut *.sh<CR>
 nmap <C-n> :cn<CR>
 nmap <C-p> :cp<CR>
 
@@ -504,13 +517,20 @@ nnoremap <Space>,, f)l<S-D>:call DoxygenCommentWriter()<CR><ESC><ESC>p0f;df<Spac
 let g:neobundle_default_git_protocol='https'
 
 if has('vim_starting')
-	set nocompatible
-	set runtimepath+=$HOME/.vim/bundle/neobundle.vim/
-endif
-call neobundle#rc(expand('$HOME/.vim/bundle/'))
+   if &compatible
+     set nocompatible               " Be iMproved
+   endif
 
-" Let NeoBundle manage NeoBundle
-NeoBundleFetch 'Shougo/neobundle.vim'
+   " Required:
+   set runtimepath+=~/.vim/bundle/neobundle.vim/
+ endif
+
+ " Required:
+ call neobundle#begin(expand('~/.vim/bundle/'))
+
+ " Let NeoBundle manage NeoBundle
+ " Required:
+ NeoBundleFetch 'Shougo/neobundle.vim'
 
 " Recommended to install
 " After install, turn shell $HOME/.vim/bundle/vimproc, (n,g)make -f
@@ -527,6 +547,9 @@ if !has("kaoriya")
 	\ }
 endif
 
+ " My Bundles here:
+ " Refer to |:NeoBundle-examples|.
+ " Note: You don't set neobundle setting in .gvimrc!
 " My Bundle {{{
 NeoBundle 'Shougo/unite.vim'
 NeoBundle 'Shougo/neomru.vim'
@@ -537,6 +560,7 @@ NeoBundle 'tsukkee/unite-tag'
 NeoBundle 'osyo-manga/unite-quickfix'
 "NeoBundle 'osyo-manga/unite-airline_themes'
 NeoBundle 'kmnk/vim-unite-svn'
+NeoBundle 'heavenshell/unite-zf'
 
 NeoBundle has('lua') ? 'Shougo/neocomplete' : 'Shougo/neocomplcache'
 NeoBundle 'Shougo/neosnippet'
@@ -570,6 +594,7 @@ NeoBundle 'kana/vim-smartchr'
 NeoBundle 'kana/vim-smartinput'
 NeoBundle 'cohama/vim-smartinput-endwise'
 NeoBundle 'kana/vim-altr'
+NeoBundle 'tpope/vim-surround'
 
 NeoBundle 'tyru/capture.vim'
 "NeoBundle 'tyru/caw.vim'
@@ -592,8 +617,14 @@ NeoBundle 't9md/vim-choosewin'
 "NeoBundle 'bling/vim-airline'
 NeoBundle 'itchyny/lightline.vim'
 
+NeoBundle 'tpope/vim-fugitive'
+NeoBundle 'gregsexton/gitv'
+NeoBundle 'idanarye/vim-merginal'
+NeoBundle 'rhysd/committia.vim'
+NeoBundle 'cohama/agit.vim'
+
 "NeoBundle 'kien/ctrlp.vim'
-"NeoBundle 'glidenote/memolist.vim'
+NeoBundle 'glidenote/memolist.vim'
 NeoBundle 'modsound/gips-vim'
 "NeoBundle 'Rip-Rip/clang_complete'
 "NeoBundle 'othree/eregex.vim'
@@ -614,6 +645,8 @@ NeoBundle 'dyng/ctrlsf.vim'
 NeoBundle 'gcmt/wildfire.vim'
 "NeoBundle 'rbtnn/rabbit-ui.vim'
 "NeoBundle 'jaxbot/semantic-highlight.vim'
+NeoBundle 'szw/vim-tags' 
+"NeoBundle 'haya14busa/incsearch.vim'
 
 NeoBundle 'vim-jp/vimdoc-ja'
 NeoBundle 'vim-scripts/Align'
@@ -624,12 +657,15 @@ NeoBundle 'vim-scripts/OmniCppComplete'
 NeoBundle 'vim-scripts/svn-diff.vim'
 " }}}
 
-" Installation check.
-NeoBundleCheck
+call neobundle#end()
 
-"ファイルタイプインデントを戻す
+" Required:
 filetype plugin indent on
 syntax enable
+
+" If there are uninstalled bundles found on startup,
+" this will conveniently prompt you to install them.
+NeoBundleCheck
 
 " unite.vim"{{{
 "-------------------------
@@ -795,16 +831,24 @@ if neobundle#is_installed('neocomplete')
 	" 補完ウィンドウの設定
 	set completeopt=menuone
 
+	" Disable AutoComplPop.
+	let g:acp_enableAtStartup = 0
+
 	" 起動時に有効化
 	let g:neocomplete#enable_at_startup = 1
 
+	" Use smartcase.
 	let g:neocomplete#enable_ignore_case = 1
 	let g:neocomplete#enable_smart_case = 1
 
+	" minimum
+	let g:neocomplete#sources#syntax#min_keyword_length = 3
+
+	" Define keyword.
 	if !exists('g:neocomplete#keyword_patterns')
 	    let g:neocomplete#keyword_patterns = {}
 	endif
-	let g:neocomplete#keyword_patterns._ = '\h\w*'
+	let g:neocomplete#keyword_patterns['default'] = '\h\w*'
 
 	if !exists('g:neocomplete#sources#dictionary#dictionaries')
 	  let g:neocomplete#sources#dictionary#dictionaries = {}
@@ -813,9 +857,6 @@ if neobundle#is_installed('neocomplete')
 
 	" 補完しないバッファ
 	let g:neocomplete#sources#buffer#disabled_pattern = '\.log\|\.log\.\|\.jax\|Log.txt'
-
-	" minimum
-	let g:neocomplete#sources#syntax#min_keyword_length = 3
 
 	"tabで補完候補の選択を行う
 	inoremap <expr><TAB> pumvisible() ? "\<Down>" : "\<TAB>"
@@ -832,11 +873,25 @@ if neobundle#is_installed('neocomplete')
 	inoremap <expr><C-e>  neocomplete#cancel_popup()
 
 	" Enable omni completion.
-	au MyAu FileType css setlocal omnifunc=csscomplete#CompleteCSS
-	au MyAu FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-	au MyAu FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-	au MyAu FileType python setlocal omnifunc=pythoncomplete#Complete
-	au MyAu FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+	autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
+	autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+	autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+	autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
+	autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+
+	" Enable heavy omni completion.
+	if !exists('g:neocomplete#sources#omni#input_patterns')
+	  let g:neocomplete#sources#omni#input_patterns = {}
+	endif
+	if !exists('g:neocomplete#force_omni_input_patterns')
+	  let g:neocomplete#force_omni_input_patterns = {}
+	endif
+	let g:neocomplete#sources#omni#input_patterns.php =
+	\ '[^. \t]->\%(\h\w*\)\?\|\h\w*::\%(\h\w*\)\?'
+	let g:neocomplete#sources#omni#input_patterns.c =
+	\ '[^.[:digit:] *\t]\%(\.\|->\)\%(\h\w*\)\?'
+	let g:neocomplete#sources#omni#input_patterns.cpp =
+	\ '[^.[:digit:] *\t]\%(\.\|->\)\%(\h\w*\)\?\|\h\w*::\%(\h\w*\)\?'
 
 	" For perlomni.vim setting.
 	" https://github.com/c9s/perlomni.vim
@@ -972,6 +1027,7 @@ if neobundle#is_installed('vim-watchdogs')
 	" :WatchdogsRun 全ての共通設定
 	let g:quickrun_config["watchdogs_checker/_"] = {
 	\	"hook/hier_update/priority_exit" : 1,
+	\	"runner/vimproc/updatetime" : 40,
 	\}
 
 	" .local.vimrcに移行
@@ -996,12 +1052,14 @@ if neobundle#is_installed('vim-watchdogs')
 	"" g:quickrun_config の設定後に
 	"" call watchdogs#setup(g:quickrun_config)
 	"" を呼び出す
-	"call watchdogs#setup(g:quickrun_config)
+	call watchdogs#setup(g:quickrun_config)
 	"
 	"" 書き込み時にwatchdogsを実行
 	"" cpp のみを有効
-	"let g:watchdogs_check_BufWritePost_enables = {}
-	"let g:watchdogs_check_BufWritePost_enables.cpp = 1
+	let g:watchdogs_check_BufWritePost_enables = {}
+	let g:watchdogs_check_BufWritePost_enables.cpp = 1
+	let g:watchdogs_check_BufWritePost_enables.php = 1
+	"let g:watchdogs_check_BufWritePost_enable = 1
 endif
 "}}}
 
@@ -1065,7 +1123,11 @@ endif
 if neobundle#is_installed('memolist.vim')
 	"set runtimepath^=$HOME/.vim/bundle/memolist.vim
 	let g:memolist_path = "$HOME/.memolist/"
-	nmap <C-w>n :MemoNew<CR>
+	"nmap <C-w>n :MemoNew<CR>
+	let g:memolist_unite        = 1
+	let g:memolist_unite_source = "file_rec"
+	let g:memolist_unite_option = "-start-insert"
+	nmap ,m :MemoList<CR>
 endif
 "}}}
 
@@ -1169,7 +1231,7 @@ if neobundle#is_installed('yankround.vim')
 	nmap ,n <Plug>(yankround-next)
 	let g:yankround_max_history = 50
 	"let g:yankround_dir = '$HOME/.cache/yankround'
-	nnoremap <silent>,y :<C-u>CtrlPYankRound<CR>
+	nnoremap <silent>,y :Unite yankround<CR>
 endif
 "}}}
 
@@ -1337,6 +1399,22 @@ if neobundle#is_installed('wildfire.vim')
 endif
 "}}}
 
+" vim-tags "{{{
+"-------------------------
+if neobundle#is_installed('vim-tags')
+	"au MyAu BufNewFile,BufRead *.php let g:vim_tags_project_tags_command = "ctags -R --languages=php /Library/WebServer/"
+endif
+"}}}
+
+" incsearch.vim "{{{
+"-------------------------
+if neobundle#is_installed('incsearch.vim')
+	map /  <Plug>(incsearch-forward)
+	map ?  <Plug>(incsearch-backward)
+	map g/ <Plug>(incsearch-stay)
+endif
+"}}}
+
 " rabbit-ui.vim "{{{
 "-------------------------
 if neobundle#is_installed('rabbit-ui.vim')
@@ -1362,13 +1440,13 @@ if neobundle#is_installed('lightline.vim')
 	let g:lightline = {
 	\	'colorscheme': 'solarized',
 	\	'active': {
-	\		'left': [ [ 'mode', 'paste' ], [ 'dir', 'filename', 'cfi' ] ]
+	\		'left': [ [ 'mode', 'paste' ], [ 'dir', 'filename' ] ]
 	\	},
 	\	'inactive': {
 	\		'left': [ [ 'dir', 'filename' ] ]
 	\	},
 	\	'tabline' : {
-	\		'left': [ [ 'cwd' ], [ 'tabs' ] ],
+	\		'left': [ [ 'git', 'cwd' ], [ 'tabs' ] ],
 	\ 		'right': [ [ 'close' ] ]
 	\	},
 	\	'component': {
@@ -1385,8 +1463,8 @@ if neobundle#is_installed('lightline.vim')
 	\		'filetype':     'MyFiletype',
 	\		'fileencoding': 'MyFileencoding',
 	\		'mode':         'MyMode',
-	\		'cfi':          'MyCurrentFuncInfo',
-	\		'cwd': 			'MyCwd'
+	\		'cwd': 			'MyCwd',
+	\		'git': 			'MyFugitive'
 	\	}
 	\}
 
@@ -1427,7 +1505,7 @@ if neobundle#is_installed('lightline.vim')
 	endfunction
 
 	function! MyFileencoding()
-		return winwidth(0) > 70 ? (strlen(&fenc) ? &fenc : &enc) : ''
+		return winwidth(0) > 70 ? GetEnc() : ''
 	endfunction
 
 	function! MyCwd()
@@ -1442,59 +1520,69 @@ if neobundle#is_installed('lightline.vim')
 			  \ winwidth(0) > 60 ? lightline#mode() : ''
 	endfunction
 
-	let g:lightline_my_cfi_cache = 'mycfi...'
-	let g:lightline_my_cfi_cache_line = 0
-	let g:lightline_my_cfi_cache_file = ''
-
-	function! MyCurrentFuncInfo()
-
-		" callされまくって重い対策
-		" 関数名を探すのは画面に見えてる場合は意味無いので
-		" それなりに移動したときだけで良いはず
-	
-		" ファイルが読めなければ行わない
-		let fname = expand('%')
-		if !filereadable(fname)
-			return g:lightline_my_cfi_cache
-		endif
-
-		" 引き続き同じファイルなら移動チェック
-		let now_line = line(".")
-		if fname == g:lightline_my_cfi_cache_file
-		
-			let border = 30
-			let chg_line = abs(now_line - g:lightline_my_cfi_cache_line)
-
-			" cacheするタイミングで関数が無いこともあるので、有る場合のみcacheを使う
-			" ただし、行移動してないときは何度もする必要ないので基本cacheを使う
-			if chg_line < border && g:lightline_my_cfi_cache != ''
-				return g:lightline_my_cfi_cache
+	function! MyFugitive()
+		try
+			if &ft !~? 'vimfiler\|gundo' && exists('*fugitive#head') && strlen(fugitive#head())
+				return ' ' . fugitive#head()
 			endif
-			if now_line == g:lightline_my_cfi_cache_line
-				return g:lightline_my_cfi_cache
-			endif
-
-		endif
-		let g:lightline_my_cfi_cache_line = now_line
-		let g:lightline_my_cfi_cache_file = fname
-
-		"下のほうに関数を書こうとするとvimが止まる対策
-		let lines = readfile(fname)
-		let max_line = len(lines)
-		if now_line+10 > max_line 
-			return g:lightline_my_cfi_cache
-		endif
-
-		if exists('*cfi#get_func_name') && (&ft == 'c' || &ft == 'cpp')
-			let fname = cfi#get_func_name('c')
-			let g:lightline_my_cfi_cache = (fname != '') ? fname . '()' : ''
-			return g:lightline_my_cfi_cache
-		elseif exists('*cfi#format')
-			let g:lightline_my_cfi_cache = cfi#format('%.43s()', '')
-			return g:lightline_my_cfi_cache
-		endif
+		catch
+		endtry
 		return ''
 	endfunction
+    "
+	" let g:lightline_my_cfi_cache = 'mycfi...'
+	" let g:lightline_my_cfi_cache_line = 0
+	" let g:lightline_my_cfi_cache_file = ''
+    "
+	" function! MyCurrentFuncInfo()
+    "
+	" 	" callされまくって重い対策
+	" 	" 関数名を探すのは画面に見えてる場合は意味無いので
+	" 	" それなりに移動したときだけで良いはず
+	"
+	" 	" ファイルが読めなければ行わない
+	" 	let fname = expand('%')
+	" 	if !filereadable(fname)
+	" 		return g:lightline_my_cfi_cache
+	" 	endif
+    "
+	" 	" 引き続き同じファイルなら移動チェック
+	" 	let now_line = line(".")
+	" 	if fname == g:lightline_my_cfi_cache_file
+	" 	
+	" 		let border = 30
+	" 		let chg_line = abs(now_line - g:lightline_my_cfi_cache_line)
+    "
+	" 		" cacheするタイミングで関数が無いこともあるので、有る場合のみcacheを使う
+	" 		" ただし、行移動してないときは何度もする必要ないので基本cacheを使う
+	" 		if chg_line < border && g:lightline_my_cfi_cache != ''
+	" 			return g:lightline_my_cfi_cache
+	" 		endif
+	" 		if now_line == g:lightline_my_cfi_cache_line
+	" 			return g:lightline_my_cfi_cache
+	" 		endif
+    "
+	" 	endif
+	" 	let g:lightline_my_cfi_cache_line = now_line
+	" 	let g:lightline_my_cfi_cache_file = fname
+    "
+	" 	"下のほうに関数を書こうとするとvimが止まる対策
+	" 	let lines = readfile(fname)
+	" 	let max_line = len(lines)
+	" 	if now_line+10 > max_line 
+	" 		return g:lightline_my_cfi_cache
+	" 	endif
+    "
+	" 	if exists('*cfi#get_func_name') && (&ft == 'c' || &ft == 'cpp')
+	" 		let fname = cfi#get_func_name('c')
+	" 		let g:lightline_my_cfi_cache = (fname != '') ? fname . '()' : ''
+	" 		return g:lightline_my_cfi_cache
+	" 	elseif exists('*cfi#format')
+	" 		let g:lightline_my_cfi_cache = cfi#format('%.43s()', '')
+	" 		return g:lightline_my_cfi_cache
+	" 	endif
+	" 	return ''
+	" endfunction
 
 endif
 "}}}
@@ -1574,6 +1662,22 @@ if neobundle#is_installed('svn-diff.vim')
 
 	" svn commit時にSvn_diff_windowsを呼び出す
 	au MyAu FileType svn nnoremap D :call Svn_diff_windows() <CR>
+
+endif
+"}}}
+
+" agit.vim "{{{
+"-------------------------
+if neobundle#is_installed('agit.vim')
+
+	autocmd FileType agit call s:my_agit_setting()
+	function! s:my_agit_setting()
+		nmap <buffer> ch <Plug>(agit-git-cherry-pick)
+		nmap <buffer> Rv <Plug>(agit-git-revert)
+	endfunction
+
+	" カーソル移動で一覧と差分を更新させたくない場合は
+	let g:agit_enable_auto_show_commit = 0
 
 endif
 "}}}
