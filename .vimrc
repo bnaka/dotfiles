@@ -210,7 +210,7 @@ au MyAu BufNewFile,BufRead *.ddl set filetype=sql
 au MyAu FileType svn setlocal fenc=utf-8
 
 " gitcommit時に自動でDiffGitCachedを呼ぶ
-au MyAu FileType gitcommit nmap D :DiffGitCached\|wincmd J<CR>
+au MyAu FileType gitcommit nmap <buffer> di :DiffGitCached\|wincmd J<CR>
 au MyAu FileType gitcommit setlocal winheight=50
 au MyAu FileType gitcommit setlocal fenc=utf-8
 
@@ -1674,6 +1674,12 @@ if neobundle#is_installed('agit.vim')
 	function! s:my_agit_setting()
 		nmap <buffer> ch <Plug>(agit-git-cherry-pick)
 		nmap <buffer> Rv <Plug>(agit-git-revert)
+		nmap <buffer> mb :AgitGit merge <C-R><C-W>
+		nmap <buffer> p  :AgitGit pull<CR>
+		nmap <buffer> f  :AgitGit fetch<CR>
+		nmap <buffer> gp :AgitGit push
+		nmap <buffer> gs :AgitGit stash
+		nmap <buffer> gsp :AgitGit stash pop
 	endfunction
 
 	" カーソル移動で一覧と差分を更新させたくない場合は
