@@ -160,6 +160,18 @@ hi MatchParen cterm=bold ctermbg=8
 "diff時にテキストが赤いので見えないから変更
 hi DiffText cterm=bold ctermbg=darkred gui=bold guibg=Red
 
+
+"---------------------------------------------------------------------------------------
+" phpオプション設定
+"---------------------------------------------------------------------------------------
+let php_sql_query = 1
+let php_baselib = 1
+let php_htmlInStrings = 1
+let php_noShortTags = 1
+let php_parent_error_close = 1
+
+let g:sql_type_default='mysql'
+
 "---------------------------------------------------------------------------------------
 " オプション設定
 "---------------------------------------------------------------------------------------
@@ -185,7 +197,7 @@ augroup MyAu"{{{
 augroup END"}}}
 
 "カレントディレクトリの移動
-au MyAu BufEnter *.nut,*.sh,*.conf,*.log,*.vim,Makefile,*.txt,*.c,*.cpp,*.h,*.hpp,*.pl,*.py,*.php,*.rb,*.js,*.css,*.html,*.phtml,*.xml,*.xsl,*.sql,*.ddl,*.csv,*.tmpl,*.script,*.as,*.tpl,*.ctp,*.cs,Capfile,*.json execute ":lcd " . expand("%:p:h")
+au MyAu BufEnter *.nut,*.sh,*.conf,*.log,*.vim,Makefile,*.txt,*.c,*.cpp,*.h,*.hpp,*.pl,*.py,*.php,*.rb,*.js,*.css,*.html,*.phtml,*.xml,*.xsl,*.sql,*.ddl,*.csv,*.tmpl,*.script,*.as,*.tpl,*.ctp,*.cs,Capfile,*.json,*.ini execute ":lcd " . expand("%:p:h")
 
 " 前回終了したカーソル行に移動
 au MyAu BufReadPost * if !&diff && line("'\"") > 0 && line("'\"") <= line("$") | exe "normal g`\"" | endif
@@ -623,6 +635,18 @@ NeoBundle 'idanarye/vim-merginal'
 NeoBundle 'rhysd/committia.vim'
 NeoBundle 'cohama/agit.vim'
 
+NeoBundleLazy 'OmniSharp/omnisharp-vim', {
+\   'autoload': { 'filetypes': [ 'cs', 'csi', 'csx' ] },
+\   'build': {
+\     'windows' : 'msbuild server/OmniSharp.sln',
+\     'mac': 'xbuild server/OmniSharp.sln',
+\     'unix': 'xbuild server/OmniSharp.sln',
+\   },
+\ }
+"NeoBundleLazy 'OrangeT/vim-csharp', { 'autoload': { 'filetypes': [ 'cs', 'csi', 'csx' ] } }
+NeoBundleLazy 'scrooloose/syntastic', { 'autoload': { 'filetypes': [ 'cs', 'csi', 'csx' ] } }
+NeoBundle 'tpope/vim-dispatch'
+
 "NeoBundle 'kien/ctrlp.vim'
 NeoBundle 'glidenote/memolist.vim'
 NeoBundle 'modsound/gips-vim'
@@ -647,6 +671,7 @@ NeoBundle 'gcmt/wildfire.vim'
 "NeoBundle 'jaxbot/semantic-highlight.vim'
 NeoBundle 'szw/vim-tags' 
 "NeoBundle 'haya14busa/incsearch.vim'
+NeoBundle 'shawncplus/phpcomplete.vim'
 
 NeoBundle 'vim-jp/vimdoc-ja'
 NeoBundle 'vim-scripts/Align'
@@ -878,6 +903,10 @@ if neobundle#is_installed('neocomplete')
 	autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
 	autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
 	autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+	if neobundle#is_installed('omnisharp-vim')
+		autocmd FileType cs setlocal omnifunc=OmniSharp#Complete
+	endif
+	" autocmd FileType php setlocal omnifunc=OmniSharp#Complete
 
 	" Enable heavy omni completion.
 	if !exists('g:neocomplete#sources#omni#input_patterns')
@@ -886,16 +915,21 @@ if neobundle#is_installed('neocomplete')
 	if !exists('g:neocomplete#force_omni_input_patterns')
 	  let g:neocomplete#force_omni_input_patterns = {}
 	endif
-	let g:neocomplete#sources#omni#input_patterns.php =
-	\ '[^. \t]->\%(\h\w*\)\?\|\h\w*::\%(\h\w*\)\?'
+	" let g:neocomplete#sources#omni#input_patterns.php =
+	" \ '[^. \t]->\%(\h\w*\)\?\|\h\w*::\%(\h\w*\)\?'
+	" let g:neocomplete#sources#omni#input_patterns.php =
+	" \ '\h\w*\|[^. \t]->\%(\h\w*\)\?\|\h\w*::\%(\h\w*\)\?'
 	let g:neocomplete#sources#omni#input_patterns.c =
 	\ '[^.[:digit:] *\t]\%(\.\|->\)\%(\h\w*\)\?'
 	let g:neocomplete#sources#omni#input_patterns.cpp =
 	\ '[^.[:digit:] *\t]\%(\.\|->\)\%(\h\w*\)\?\|\h\w*::\%(\h\w*\)\?'
+	let g:neocomplete#sources#omni#input_patterns.cs = 
+	\'.*[^=\);]'
 
 	" For perlomni.vim setting.
 	" https://github.com/c9s/perlomni.vim
 	"let g:neocomplete#sources#omni#input_patterns.perl = '\h\w*->\h\w*\|\h\w*::'
+	
 endif
 "}}}
 
@@ -1029,7 +1063,11 @@ if neobundle#is_installed('vim-watchdogs')
 	\	"hook/hier_update/priority_exit" : 1,
 	\	"runner/vimproc/updatetime" : 40,
 	\}
-
+	let g:quickrun_config['watchdogs_checker/php'] = {
+	\   'command':     'php',
+	\   'exec':        '%c -d error_reporting=E_ALL -d display_errors=1 -d display_startup_errors=1 -d log_errors=0 -d xdebug.cli_color=0 -l %o %s:p',
+	\   'errorformat': '%m\ in\ %f\ on\ line\ %l'
+	\}
 	" .local.vimrcに移行
 	"" 新しいツールの設定を追加
 	"" g:quickrun_config.watchdogs_checker/{tool-name} に設定する
@@ -1066,6 +1104,7 @@ endif
 " vim-ref"{{{
 "-------------------------
 if neobundle#is_installed('vim-ref')
+	let g:ref_cache_dir = $HOME . '/.vim/vim-ref/cache'
 	let g:ref_phpmanual_path = $HOME . '/.manual/php-chunked-xhtml'
 	let g:ref_phpmanual_cmd = 'w3m -dump %s'
 	au MyAu FileType c,cpp let g:ref_man_cmd = "man 3"
@@ -1684,6 +1723,43 @@ if neobundle#is_installed('agit.vim')
 
 	" カーソル移動で一覧と差分を更新させたくない場合は
 	let g:agit_enable_auto_show_commit = 0
+
+endif
+"}}}
+
+" omnisharp-vim "{{{
+"-------------------------
+if neobundle#is_installed('omnisharp-vim')
+
+	let g:OmniSharp_host = "http://localhost:2000"
+	let g:OmniSharp_selector_ui = 'unite'
+	let g:OmniSharp_timeout = 1
+
+	autocmd FileType cs call s:my_omnisharp_setting()
+	function! s:my_omnisharp_setting()
+		nmap <buffer> <C-]> :OmniSharpGotoDefinition<CR>
+		nmap <buffer> <Space>] :OmniSharpBuildAsync<CR>
+	endfunction
+
+endif
+"}}}
+
+
+" syntastic "{{{
+"-------------------------
+if neobundle#is_installed('syntastic')
+
+	" set statusline+=%#warningmsg#
+	" set statusline+=%{SyntasticStatuslineFlag()}
+	" set statusline+=%*
+
+	" let g:syntastic_always_populate_loc_list = 1
+	" let g:syntastic_auto_loc_list = 1
+	" let g:syntastic_check_on_open = 1
+	" let g:syntastic_check_on_wq = 0
+	"
+	" let g:syntastic_cs_checkers = ['syntax', 'semantic', 'issues']
+	let g:syntastic_cs_checkers = ['syntax', 'semantic']
 
 endif
 "}}}
