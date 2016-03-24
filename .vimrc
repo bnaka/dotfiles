@@ -644,7 +644,7 @@ NeoBundleLazy 'OmniSharp/omnisharp-vim', {
 \   },
 \ }
 "NeoBundleLazy 'OrangeT/vim-csharp', { 'autoload': { 'filetypes': [ 'cs', 'csi', 'csx' ] } }
-NeoBundleLazy 'scrooloose/syntastic', { 'autoload': { 'filetypes': [ 'cs', 'csi', 'csx' ] } }
+NeoBundleLazy 'scrooloose/syntastic', { 'autoload': { 'filetypes': [ 'cs', 'csi', 'csx', 'javascript' ] } }
 NeoBundle 'tpope/vim-dispatch'
 
 "NeoBundle 'kien/ctrlp.vim'
@@ -1715,7 +1715,7 @@ if neobundle#is_installed('agit.vim')
 		nmap <buffer> Rv <Plug>(agit-git-revert)
 		nmap <buffer> mb :AgitGit merge <C-R><C-W>
 		nmap <buffer> p  :AgitGit pull<CR>
-		nmap <buffer> f  :AgitGit fetch<CR>
+		nmap <buffer> f  :AgitGit fetch -p<CR>
 		nmap <buffer> gp :AgitGit push
 		nmap <buffer> gs :AgitGit stash
 		nmap <buffer> gsp :AgitGit stash pop
@@ -1723,6 +1723,8 @@ if neobundle#is_installed('agit.vim')
 
 	" カーソル移動で一覧と差分を更新させたくない場合は
 	let g:agit_enable_auto_show_commit = 0
+	" ログの行数
+	let g:agit_max_log_lines = 1000
 
 endif
 "}}}
@@ -1739,11 +1741,11 @@ if neobundle#is_installed('omnisharp-vim')
 	function! s:my_omnisharp_setting()
 		nmap <buffer> <C-]> :OmniSharpGotoDefinition<CR>
 		nmap <buffer> <Space>] :OmniSharpBuildAsync<CR>
+		nmap <buffer> <Space>r :OmniSharpReloadSolution<CR>
 	endfunction
 
 endif
 "}}}
-
 
 " syntastic "{{{
 "-------------------------
@@ -1760,6 +1762,8 @@ if neobundle#is_installed('syntastic')
 	"
 	" let g:syntastic_cs_checkers = ['syntax', 'semantic', 'issues']
 	let g:syntastic_cs_checkers = ['syntax', 'semantic']
+
+	let g:syntastic_javascript_checkers = ['syntax', 'eslint']
 
 endif
 "}}}
