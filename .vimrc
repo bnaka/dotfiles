@@ -158,7 +158,7 @@ hi Pmenu term=bold cterm=reverse ctermbg=7
 hi MatchParen cterm=bold ctermbg=8
 
 "diff時にテキストが赤いので見えないから変更
-hi DiffText cterm=bold ctermbg=darkred gui=bold guibg=Red
+hi DiffText cterm=bold ctermfg=7 ctermbg=darkred gui=bold guibg=Red
 
 
 "---------------------------------------------------------------------------------------
@@ -518,7 +518,6 @@ au MyAu FileType c,cpp vmap <Space>/ :Align //!<<CR>
 let g:doxycommenter_file_author = "B.Naka"
 nnoremap <Space>,, f)l<S-D>:call DoxygenCommentWriter()<CR><ESC><ESC>p0f;df<Space>2jo{<CR>}<ESC>k
 
-
 " NeoBundle.vim
 "-------------------------
 " setup neobundle
@@ -625,7 +624,7 @@ NeoBundle 't9md/vim-quickhl'
 NeoBundle 't9md/vim-choosewin'
 
 "NeoBundle 'alpaca-tc/alpaca_powertabline'
-"NeoBundle 'Lokaltog/powerline', { 'rtp' : 'powerline/bindings/vim'}
+NeoBundle 'powerline/powerline', { 'rtp' : 'powerline/bindings/vim/'}
 "NeoBundle 'bling/vim-airline'
 NeoBundle 'itchyny/lightline.vim'
 
@@ -1496,7 +1495,6 @@ if neobundle#is_installed('lightline.vim')
 	\	'component_function': {
 	\		'modified':     'MyModified',
 	\		'readonly':     'MyReadonly',
-	\		'fugitive':     'MyFugitive',
 	\		'filename':     'MyFilename',
 	\		'fileformat':   'MyFileformat',
 	\		'filetype':     'MyFiletype',
@@ -1504,7 +1502,9 @@ if neobundle#is_installed('lightline.vim')
 	\		'mode':         'MyMode',
 	\		'cwd': 			'MyCwd',
 	\		'git': 			'MyFugitive'
-	\	}
+	\	},
+	\	'separator': { 'left': "\ue0b0", 'right': "\ue0b2" },
+	\	'subseparator': { 'left': "\ue0b1", 'right': "\ue0b3" }
 	\}
 
 	function! MyModified()
@@ -1513,7 +1513,7 @@ if neobundle#is_installed('lightline.vim')
 
 	function! MyReadonly()
 	"	return &ft !~? 'help\|vimfiler\|gundo' && &readonly ? 'x' : ''
-		return &readonly ? '[RO]' : ''
+		return &readonly ? "\ue0a2" : ''
 	endfunction
 
 	function! MyFilename()
@@ -1523,16 +1523,6 @@ if neobundle#is_installed('lightline.vim')
 				\  &ft == 'vimshell' ? vimshell#get_status_string() :
 				\ '' != expand('%:t') ? expand('%:t') : '[No Name]') .
 				\ ('' != MyModified() ? ' ' . MyModified() : '')
-	endfunction
-
-	function! MyFugitive()
-		try
-			if &ft !~? 'vimfiler\|gundo' && exists('*fugitive#head')
-				return fugitive#head()
-			endif
-		catch
-		endtry
-		return ''
 	endfunction
 
 	function! MyFileformat()
@@ -1562,7 +1552,7 @@ if neobundle#is_installed('lightline.vim')
 	function! MyFugitive()
 		try
 			if &ft !~? 'vimfiler\|gundo' && exists('*fugitive#head') && strlen(fugitive#head())
-				return ' ' . fugitive#head()
+				return "\ue0a0 " . fugitive#head()
 			endif
 		catch
 		endtry
@@ -1622,6 +1612,23 @@ if neobundle#is_installed('lightline.vim')
 	" 	endif
 	" 	return ''
 	" endfunction
+
+endif
+"}}}
+
+" powerline "{{{
+"-------------------------
+if neobundle#is_installed('powerline')
+
+	set noshowmode
+
+	if exists("&ambiwidth")
+		set ambiwidth=
+	endif
+
+	python from powerline.vim import setup as powerline_setup
+	python powerline_setup()
+	python del powerline_setup
 
 endif
 "}}}
@@ -1713,18 +1720,19 @@ if neobundle#is_installed('agit.vim')
 	function! s:my_agit_setting()
 		nmap <buffer> ch <Plug>(agit-git-cherry-pick)
 		nmap <buffer> Rv <Plug>(agit-git-revert)
-		nmap <buffer> mb :AgitGit merge <C-R><C-W>
+		nmap <buffer> mb :AgitGit merge --no-ff <C-R><C-W>
 		nmap <buffer> p  :AgitGit pull<CR>
 		nmap <buffer> f  :AgitGit fetch -p<CR>
 		nmap <buffer> gp :AgitGit push
 		nmap <buffer> gs :AgitGit stash
 		nmap <buffer> gsp :AgitGit stash pop
+		nmap <buffer> cB :<C-R><C-W><C-A><C-D><C-D><C-D><C-D><C-D><C-D><C-D>AgitGit checkout -b <C-E> <C-R><C-W>
 	endfunction
 
 	" カーソル移動で一覧と差分を更新させたくない場合は
 	let g:agit_enable_auto_show_commit = 0
 	" ログの行数
-	let g:agit_max_log_lines = 1000
+	let g:agit_max_log_lines = 2000
 
 endif
 "}}}
