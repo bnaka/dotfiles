@@ -229,6 +229,11 @@ au MyAu FileType gitcommit setlocal fenc=utf-8
 " コメント行で改行したらコメントを自動挿入をoff
 au MyAu FileType cpp set formatoptions-=ro
 
+" xmlファイル開いたら自動で整形
+command! Prettify :%s/></>\r</g | filetype indent on | setf xml | normal gg=G
+au MyAu FileType xml nmap <buffer> <space>= :Prettify<CR>
+
+
 "---------------------------------------------------------------------------------------
 " key-mapping
 "---------------------------------------------------------------------------------------
@@ -1721,12 +1726,13 @@ if neobundle#is_installed('agit.vim')
 		nmap <buffer> ch <Plug>(agit-git-cherry-pick)
 		nmap <buffer> Rv <Plug>(agit-git-revert)
 		nmap <buffer> mb :AgitGit merge --no-ff <C-R><C-W>
-		nmap <buffer> p  :AgitGit pull<CR>
 		nmap <buffer> f  :AgitGit fetch -p<CR>
+		nmap <buffer> p  :AgitGit pull
 		nmap <buffer> gp :AgitGit push
-		nmap <buffer> gs :AgitGit stash
-		nmap <buffer> gsp :AgitGit stash pop
-		nmap <buffer> cB :<C-R><C-W><C-A><C-D><C-D><C-D><C-D><C-D><C-D><C-D>AgitGit checkout -b <C-E> <C-R><C-W>
+		nmap <buffer> gP :AgitGit push --set-upstream origin <branch>
+		nmap <buffer> s  :AgitGit stash
+		nmap <buffer> sp :AgitGit stash pop
+		nmap <buffer> cB :<C-R><C-W><C-A><C-D><C-D><C-D><C-D><C-D><C-D><C-D>AgitGit checkout -B <C-E> <C-R><C-W>
 	endfunction
 
 	" カーソル移動で一覧と差分を更新させたくない場合は
