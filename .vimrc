@@ -611,6 +611,7 @@ NeoBundle 'kana/vim-smartinput'
 NeoBundle 'cohama/vim-smartinput-endwise'
 NeoBundle 'kana/vim-altr'
 NeoBundle 'tpope/vim-surround'
+NeoBundle 'haya14busa/vim-metarepeat'
 
 NeoBundle 'tyru/capture.vim'
 "NeoBundle 'tyru/caw.vim'
@@ -676,6 +677,7 @@ NeoBundle 'gcmt/wildfire.vim'
 NeoBundle 'szw/vim-tags' 
 "NeoBundle 'haya14busa/incsearch.vim'
 NeoBundle 'shawncplus/phpcomplete.vim'
+NeoBundle "aklt/plantuml-syntax"
 
 NeoBundle 'vim-jp/vimdoc-ja'
 NeoBundle 'vim-scripts/Align'
@@ -1055,6 +1057,16 @@ if neobundle#is_installed('vim-quickrun')
 	\		"hook/copen/enable_failure" : 1,
 	\		"hook/hier_update/priority_exit" : 1,
 	\	},
+	\	"plantuml" :{ "type" : "txt/plantuml" },
+	\	"txt/plantuml" : {
+	\		"exec" : "sh $HOME/Library/Java/plantuml.sh %s:t:r",
+	\		"outputter" : "multi",
+	\		"outputter/multi/targets" : ["quickfix","buffer"],
+	\		"hook/close_buffer/enable_exit" : 1,
+	\		"hook/close_quickfix/enable_exit" : 0,
+	\		"hook/copen/enable_failure" : 1,
+	\		"hook/hier_update/priority_exit" : 1,
+	\	},
 	\}
 endif
 "}}}
@@ -1321,6 +1333,13 @@ if neobundle#is_installed('vim-altr')
 	command! A  call altr#forward()
 	" tmplに対するルールを指定
 	call altr#define('%.cpp.tmpl', '%.h.tmpl', '%.hpp.tmpl', '%.c.tmpl')
+endif
+"}}}
+
+" vim-metarepeat "{{{
+"-------------------------
+if neobundle#is_installed('vim-metarepeat')
+    let g:meterepeat#default_mapping = 1
 endif
 "}}}
 
@@ -1631,9 +1650,9 @@ if neobundle#is_installed('powerline')
 		set ambiwidth=
 	endif
 
-	python from powerline.vim import setup as powerline_setup
-	python powerline_setup()
-	python del powerline_setup
+	" python from powerline.vim import setup as powerline_setup
+	" python powerline_setup()
+	" python del powerline_setup
 
 endif
 "}}}
@@ -1725,6 +1744,7 @@ if neobundle#is_installed('agit.vim')
 	function! s:my_agit_setting()
 		nmap <buffer> ch <Plug>(agit-git-cherry-pick)
 		nmap <buffer> Rv <Plug>(agit-git-revert)
+		nmap <buffer> rb :<C-u>AgitGitConfirm rebase --autostash <hash><CR>
 		nmap <buffer> mb :AgitGit merge --no-ff <C-R><C-W>
 		nmap <buffer> f  :AgitGit fetch -p<CR>
 		nmap <buffer> p  :AgitGit pull
