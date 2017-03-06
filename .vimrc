@@ -75,6 +75,16 @@ set formatoptions-=ro
 if has("clipboard")
 	set clipboard+=unnamed,autoselect
 endif
+ 
+" クリップボード共有
+if has("clipboard")
+	set clipboard+=unnamed,autoselect
+endif
+
+" shell の設定
+if has('win95') || has('win16') || has('win32')
+	set shell=C:\WINDOWS\system32\cmd.exe
+endif
 
 "---------------------------------------------------------------------------------------
 " 表示関連
@@ -197,7 +207,7 @@ augroup MyAu"{{{
 augroup END"}}}
 
 "カレントディレクトリの移動
-au MyAu BufEnter *.nut,*.sh,*.conf,*.log,*.vim,Makefile,*.txt,*.c,*.cpp,*.h,*.hpp,*.pl,*.py,*.php,*.rb,*.js,*.css,*.html,*.phtml,*.xml,*.xsl,*.sql,*.ddl,*.csv,*.tmpl,*.script,*.as,*.tpl,*.ctp,*.cs,Capfile,*.json,*.ini execute ":lcd " . expand("%:p:h")
+au MyAu BufEnter *.nut,*.sh,*.conf,*.log,*.vim,*.txt,*.c,*.cpp,*.cc,*.h,*.hpp,*.inc,*.tpp,*.pl,*.py,*.php,*.rb,*.erb,*.js,*.css,*.html,*.phtml,*.xml,*.xsl,*.sql,*.ddl,*.csv,*.tmpl,*.script,*.as,*.tpl,*.ctp,*.cs,*.json,*.ini,*.mk,*.md,[A-Z]*file execute ":lcd " . expand("%:p:h")
 
 " 前回終了したカーソル行に移動
 au MyAu BufReadPost * if !&diff && line("'\"") > 0 && line("'\"") <= line("$") | exe "normal g`\"" | endif
@@ -206,6 +216,8 @@ au MyAu BufReadPost * if !&diff && line("'\"") > 0 && line("'\"") <= line("$") |
 au MyAu QuickfixCmdPost make,grep,grepadd,vimgrep copen
 au MyAu QuickfixCmdPost l* lopen
 
+" 拡張cppファイル認識
+au MyAu BufNewFile,BufRead *.inc,*.tpp set filetype=cpp
 " actionscriptファイル認識
 au MyAu BufNewFile,BufRead *.as set filetype=actionscript
 " genshiファイル認識
@@ -225,9 +237,6 @@ au MyAu FileType svn setlocal fenc=utf-8
 au MyAu FileType gitcommit nmap <buffer> di :DiffGitCached\|wincmd J<CR>
 au MyAu FileType gitcommit setlocal winheight=50
 au MyAu FileType gitcommit setlocal fenc=utf-8
-
-" コメント行で改行したらコメントを自動挿入をoff
-au MyAu FileType cpp set formatoptions-=ro
 
 " xmlファイル開いたら自動で整形
 command! Prettify :%s/></>\r</g | filetype indent on | setf xml | normal gg=G
@@ -404,7 +413,6 @@ nnoremap <Space>1 :e ++enc=iso-2022-jp-3<CR>
 "}}}
 
 " .hと.hppを新規で開いた場合に#ifdef - #endifを挿入する
-au MyAu BufNewFile *.h,*.hpp call IncludeGuard()
 function! IncludeGuard()"{{{
    let fl = getline(1)
    if fl =~ "^#if"
@@ -418,6 +426,7 @@ function! IncludeGuard()"{{{
    execute "normal! Go#endif   /* " . gatename . " */"
    4
 endfunction"}}}
+au MyAu BufNewFile *.h,*.hpp call IncludeGuard()
 
 " cプリプロセッサにかける(http://vimwiki.net/?tips)
 function! CppRegion()"{{{
@@ -511,6 +520,7 @@ function! VisualEcho()"{{{
 	call setpos('.', pos)
 endfunction"}}}
 
+
 "---------------------------------------------------------------------------------------
 " plugin
 "---------------------------------------------------------------------------------------
@@ -529,24 +539,55 @@ nnoremap <Space>,, f)l<S-D>:call DoxygenCommentWriter()<CR><ESC><ESC>p0f;df<Spac
 " $ mkdir -p $HOME/.vim/bundle
 " $ git clone git://github.com/Shougo/neobundle.vim $HOME/.vim/bundle/neobundle.vim
 
+" プラグインの読み込み
+if !executable("git")
+	echo "Please install git."
+	finish
+endif
+
+" プラグインのインストールディレクトリ
+let s:neobundle_plugins_dir = expand(exists("$VIM_NEOBUNDLE_PLUGIN_DIR") ? $VIM_NEOBUNDLE_PLUGIN_DIR : '~/.vim/bundle')
+
+if !isdirectory(s:neobundle_plugins_dir . "/neobundle.vim")
+	echo "Please install neobundle.vim."
+	function! s:install_neobundle()
+		if input("Install neobundle.vim? [Y/N] : ") =="Y"
+			if !isdirectory(s:neobundle_plugins_dir)
+				call mkdir(s:neobundle_plugins_dir, "p")
+			endif
+
+			execute "!git clone git://github.com/Shougo/neobundle.vim "
+			\ . s:neobundle_plugins_dir . "/neobundle.vim"
+			echo "neobundle installed. Please restart vim."
+		else
+			echo "Canceled."
+		endif
+	endfunction
+	augroup install-neobundle
+		autocmd!
+		autocmd VimEnter * call s:install_neobundle()
+	augroup END
+	finish
+endif
+
 " proxy
 let g:neobundle_default_git_protocol='https'
 
 if has('vim_starting')
-   if &compatible
-     set nocompatible               " Be iMproved
-   endif
+	if &compatible
+		set nocompatible               " Be iMproved
+	endif
 
-   " Required:
-   set runtimepath+=~/.vim/bundle/neobundle.vim/
- endif
+	" Required:
+	execute "set runtimepath+=" . s:neobundle_plugins_dir . "/neobundle.vim"
+endif
 
- " Required:
- call neobundle#begin(expand('~/.vim/bundle/'))
+" Required:
+call neobundle#begin(expand(s:neobundle_plugins_dir))
 
- " Let NeoBundle manage NeoBundle
- " Required:
- NeoBundleFetch 'Shougo/neobundle.vim'
+" Let NeoBundle manage NeoBundle
+" Required:
+NeoBundleFetch 'Shougo/neobundle.vim'
 
 " Recommended to install
 " After install, turn shell $HOME/.vim/bundle/vimproc, (n,g)make -f
@@ -579,8 +620,9 @@ NeoBundle 'kmnk/vim-unite-svn'
 NeoBundle 'heavenshell/unite-zf'
 
 NeoBundle has('lua') ? 'Shougo/neocomplete' : 'Shougo/neocomplcache'
-NeoBundle 'Shougo/neosnippet'
+NeoBundle 'Shougo/neosnippet.vim'
 NeoBundle 'Shougo/neosnippet-snippets'
+NeoBundle 'Shougo/neoinclude.vim'
 NeoBundle 'Shougo/vimshell'
 NeoBundle 'Shougo/vimfiler'
 NeoBundle 'Shougo/context_filetype.vim'
@@ -589,7 +631,7 @@ NeoBundle 'thinca/vim-quickrun'
 NeoBundle 'osyo-manga/shabadou.vim'
 NeoBundle 'osyo-manga/vim-watchdogs'
 NeoBundle 'dannyob/quickfixstatus'
-NeoBundle 'jceb/vim-hier'
+NeoBundle 'cohama/vim-hier'
 
 NeoBundle 'mattn/webapi-vim'
 NeoBundle 'mattn/vdbi-vim'
@@ -640,6 +682,8 @@ NeoBundle 'idanarye/vim-merginal'
 NeoBundle 'rhysd/committia.vim'
 NeoBundle 'cohama/agit.vim'
 
+NeoBundle 'juneedahamed/vc.vim'
+
 NeoBundleLazy 'OmniSharp/omnisharp-vim', {
 \   'autoload': { 'filetypes': [ 'cs', 'csi', 'csx' ] },
 \   'build': {
@@ -649,13 +693,17 @@ NeoBundleLazy 'OmniSharp/omnisharp-vim', {
 \   },
 \ }
 "NeoBundleLazy 'OrangeT/vim-csharp', { 'autoload': { 'filetypes': [ 'cs', 'csi', 'csx' ] } }
-NeoBundleLazy 'scrooloose/syntastic', { 'autoload': { 'filetypes': [ 'cs', 'csi', 'csx', 'javascript' ] } }
+NeoBundleLazy 'scrooloose/syntastic', { 'autoload': { 'filetypes': [ 'cs', 'csi', 'csx', 'javascript', 'c', 'cpp' ] } }
 NeoBundle 'tpope/vim-dispatch'
+
+"NeoBundle 'Rip-Rip/clang_complete'
+NeoBundle 'justmao945/vim-clang'
+NeoBundle 'osyo-manga/vim-snowdrop'
+NeoBundleLazy 'vim-jp/cpp-vim', { 'autoload': { 'filetypes' : [ 'c', 'cpp' ]}}
 
 "NeoBundle 'kien/ctrlp.vim'
 NeoBundle 'glidenote/memolist.vim'
 NeoBundle 'modsound/gips-vim'
-"NeoBundle 'Rip-Rip/clang_complete'
 "NeoBundle 'othree/eregex.vim'
 NeoBundle 'tomtom/tcomment_vim'
 NeoBundle 'rhysd/clever-f.vim'
@@ -686,6 +734,7 @@ NeoBundle 'vim-scripts/Align'
 NeoBundle 'vim-scripts/vcscommand.vim'
 NeoBundle 'vim-scripts/OmniCppComplete'
 NeoBundle 'vim-scripts/svn-diff.vim'
+NeoBundle 'vim-scripts/textgenshi.vim'
 " }}}
 
 call neobundle#end()
@@ -915,6 +964,7 @@ if neobundle#is_installed('neocomplete')
 	" autocmd FileType php setlocal omnifunc=OmniSharp#Complete
 
 	" Enable heavy omni completion.
+	let g:neocomplete#force_overwrite_completefunc = 1
 	if !exists('g:neocomplete#sources#omni#input_patterns')
 	  let g:neocomplete#sources#omni#input_patterns = {}
 	endif
@@ -929,6 +979,10 @@ if neobundle#is_installed('neocomplete')
 	\ '[^.[:digit:] *\t]\%(\.\|->\)\%(\h\w*\)\?'
 	let g:neocomplete#sources#omni#input_patterns.cpp =
 	\ '[^.[:digit:] *\t]\%(\.\|->\)\%(\h\w*\)\?\|\h\w*::\%(\h\w*\)\?'
+	" let g:neocomplete#force_omni_input_patterns.c =
+	" 			\ '[^.[:digit:] *\t]\%(\.\|->\)\w*'
+	" let g:neocomplete#force_omni_input_patterns.cpp =
+	" 			\ '[^.[:digit:] *\t]\%(\.\|->\)\w*\|\h\w*::\w*'
 	let g:neocomplete#sources#omni#input_patterns.cs = 
 	\'.*[^=\);]'
 
@@ -936,6 +990,80 @@ if neobundle#is_installed('neocomplete')
 	" https://github.com/c9s/perlomni.vim
 	"let g:neocomplete#sources#omni#input_patterns.perl = '\h\w*->\h\w*\|\h\w*::'
 	
+endif
+"}}}
+
+" vim-clang"{{{
+"-------------------------
+if neobundle#is_installed('vim-clang')
+
+	" disable auto completion for vim-clang
+	let g:clang_auto = 0
+	let g:clang_complete_auto = 0
+	let g:clang_auto_select = 0
+	let g:clang_use_library = 1
+    "
+	" " default 'longest' can not work with neocomplete
+	let g:clang_c_completeopt   = 'menuone'
+	let g:clang_cpp_completeopt = 'menuone'
+    "
+	" if executable('clang-3.6')
+	" 	let g:clang_exec = 'clang-3.6'
+	" elseif executable('clang-3.5')
+	" 	let g:clang_exec = 'clang-3.5'
+	" elseif executable('clang-3.4')
+	" 	let g:clang_exec = 'clang-3.4'
+	" else
+	" 	let g:clang_exec = 'clang'
+	" endif
+    "
+	" if executable('clang-format-3.6')
+	" 	let g:clang_format_exec = 'clang-format-3.6'
+	" elseif executable('clang-format-3.5')
+	" 	let g:clang_format_exec = 'clang-format-3.5'
+	" elseif executable('clang-format-3.4')
+	" 	let g:clang_format_exec = 'clang-format-3.4'
+	" else
+	" 	let g:clang_exec = 'clang-format'
+	" endif
+    "
+	
+	let g:clang_cpp_options = '-std=c++1y -stdlib=libc++'
+endif
+"}}}
+
+" clang_complete"{{{
+"-------------------------
+if neobundle#is_installed('clang_complete')
+	" 自動呼出しOFF neocomplcacheと競合回避
+	let g:clang_complete_auto=1
+endif
+"}}}
+
+" vim-snowdrop"{{{
+"-------------------------
+if neobundle#is_installed('vim-snowdrop')
+	let g:snowdrop#libclang_path = "/usr/lib64/llvm/"
+
+	let g:snowdrop#include_paths = {
+	\	"cpp" : filter(
+	\	split(glob('/usr/include/c++/*'), '\n') +
+	\	split(glob('/usr/include/*/c++/*'), '\n') +
+	\	split(glob('/usr/include/*/'), '\n'),
+	\	'isdirectory(v:val)')
+	\}
+	let g:snowdrop#goto_definition_open_cmd = "split"
+
+	let g:snowdrop#command_options = {
+	\	"cpp" : "-std=c++1y",
+	\}
+
+	autocmd FileType cpp nnoremap <C-]> :call snowdrop#goto_definition_in_cursor("edit")<CR>
+	autocmd FileType cpp nnoremap <C-w>] :call snowdrop#goto_definition_in_cursor("split")<CR>
+
+	if neobundle#is_installed('neocomplete')
+		let g:neocomplete#sources#snowdrop#enable = 0
+	endif
 endif
 "}}}
 
@@ -1057,6 +1185,7 @@ if neobundle#is_installed('vim-quickrun')
 	\		"hook/copen/enable_failure" : 1,
 	\		"hook/hier_update/priority_exit" : 1,
 	\	},
+	\
 	\	"plantuml" :{ "type" : "txt/plantuml" },
 	\	"txt/plantuml" : {
 	\		"exec" : "sh $HOME/Library/Java/plantuml.sh %s:t:r",
@@ -1067,7 +1196,16 @@ if neobundle#is_installed('vim-quickrun')
 	\		"hook/copen/enable_failure" : 1,
 	\		"hook/hier_update/priority_exit" : 1,
 	\	},
+	\
+	\	"cpp/g++" : {
+	\		"cmdopt" : "-std=c++1y -Wall",
+	\	},
+    \
+	\	"cpp/clang++" : {
+	\		"cmdopt" : "-std=c++1y -Wall",
+	\	},
 	\}
+
 endif
 "}}}
 
@@ -1084,6 +1222,16 @@ if neobundle#is_installed('vim-watchdogs')
 	\   'exec':        '%c -d error_reporting=E_ALL -d display_errors=1 -d display_startup_errors=1 -d log_errors=0 -d xdebug.cli_color=0 -l %o %s:p',
 	\   'errorformat': '%m\ in\ %f\ on\ line\ %l'
 	\}
+	" let g:quickrun_config["cpp/watchdogs_checker"] = {
+	" \		"type" : "watchdogs_checker/clang++",
+	" \}
+	" let g:quickrun_config["watchdogs_checker/g++"] = {
+	" \		"cmdopt" : "-Wall",
+	" \}
+	" let g:quickrun_config["watchdogs_checker/clang++"] = {
+	" \		"cmdopt" : "-Wall",
+	" \}
+
 	" .local.vimrcに移行
 	"" 新しいツールの設定を追加
 	"" g:quickrun_config.watchdogs_checker/{tool-name} に設定する
@@ -1094,14 +1242,14 @@ if neobundle#is_installed('vim-watchdogs')
 	"" %o   : cmdopt
 	"" %s:p : ソースファイルの絶対パス
 	"" に展開される
-	"let g:quickrun_config["watchdogs_checker/proj"] = {
-	"\	"command"   : "g++",
-	"\	"exec"      : "%c %o -fsyntax-only %s:p ",
-	"\	"cmdopt"    : "",
-	"\}
-	"let g:quickrun_config["cpp/watchdogs_checker"] = {
-	"\	"type" : "watchdogs_checker/proj",
-	"\}
+	" let g:quickrun_config["watchdogs_checker/proj"] = {
+	" \	"command"   : "g++",
+	" \	"exec"      : "%c %o -fsyntax-only %s:p ",
+	" \	"cmdopt"    : "-std=c++1y -Wall",
+	" \}
+	" let g:quickrun_config["cpp/watchdogs_checker"] = {
+	" \	"type" : "watchdogs_checker/proj",
+	" \}
 	"
 	"" g:quickrun_config の設定後に
 	"" call watchdogs#setup(g:quickrun_config)
@@ -1111,7 +1259,7 @@ if neobundle#is_installed('vim-watchdogs')
 	"" 書き込み時にwatchdogsを実行
 	"" cpp のみを有効
 	let g:watchdogs_check_BufWritePost_enables = {}
-	let g:watchdogs_check_BufWritePost_enables.cpp = 1
+	let g:watchdogs_check_BufWritePost_enables.cpp = 0
 	let g:watchdogs_check_BufWritePost_enables.php = 1
 	"let g:watchdogs_check_BufWritePost_enable = 1
 endif
@@ -1166,7 +1314,7 @@ if neobundle#is_installed('vim-hier')
 	" エラーを赤字の波線で
 	"execute "highlight qf_error_ucurl gui=bold guisp=Red"
 	"let g:hier_highlight_group_qf  = "qf_error_ucurl"
-	let g:hier_highlight_group_qf  = "SpellLocal"
+	"let g:hier_highlight_group_qf  = "SpellLocal"
 	" 警告を青字の波線で
 	"execute "highlight qf_warning_ucurl gui=underline guisp=Blue"
 	"let g:hier_highlight_group_qfw = "qf_warning_ucurl"
@@ -1225,14 +1373,6 @@ if neobundle#is_installed('vimshell')
 	autocmd FileType int-* call s:interactive_settings()
 	function! s:interactive_settings()
 	endfunction
-endif
-"}}}
-
-" clang_complete"{{{
-"-------------------------
-if neobundle#is_installed('clang_complete')
-	" 自動呼出しOFF neocomplcacheと競合回避
-	let g:clang_complete_auto=1
 endif
 "}}}
 
@@ -1754,6 +1894,13 @@ if neobundle#is_installed('agit.vim')
 		nmap <buffer> sp :AgitGit stash pop
 		nmap <buffer> cB :<C-R><C-W><C-A><C-D><C-D><C-D><C-D><C-D><C-D><C-D>AgitGit checkout -B <C-E> <C-R><C-W>
 	endfunction
+
+	"git-svn 環境
+	"autocmd FileType agit call s:svn_agit_setting()
+	"function! s:svn_agit_setting()
+	"	nmap <buffer> f  :AgitGit svn fetch -p<CR>
+	"	nmap <buffer> gp :AgitGit svn dcommit
+	"endfunction
 
 	" カーソル移動で一覧と差分を更新させたくない場合は
 	let g:agit_enable_auto_show_commit = 0
