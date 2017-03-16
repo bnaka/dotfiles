@@ -1,0 +1,4 @@
+*.o
+.local.vimrc
+tags
+*.swp
