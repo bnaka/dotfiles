@@ -218,6 +218,8 @@ au MyAu QuickfixCmdPost l* lopen
 
 " 拡張cppファイル認識
 au MyAu BufNewFile,BufRead *.inc,*.tpp set filetype=cpp
+" csファイル認識
+au MyAu FileType csharp setlocal ft=cs
 " actionscriptファイル認識
 au MyAu BufNewFile,BufRead *.as set filetype=actionscript
 " genshiファイル認識
@@ -1268,11 +1270,28 @@ endif
 " vim-ref"{{{
 "-------------------------
 if neobundle#is_installed('vim-ref')
+	let ref_manual_dir = $HOME . '/.manual/'
+	if !isdirectory(ref_manual_dir)
+		call mkdir(ref_manual_dir, "p")
+	endif
+
 	let g:ref_cache_dir = $HOME . '/.vim/vim-ref/cache'
-	let g:ref_phpmanual_path = $HOME . '/.manual/php-chunked-xhtml'
+	let g:ref_phpmanual_path = ref_manual_dir . 'php-chunked-xhtml'
 	let g:ref_phpmanual_cmd = 'w3m -dump %s'
 	au MyAu FileType c,cpp let g:ref_man_cmd = "man 3"
 	au MyAu FileType ref-phpmanual nnoremap <silent> <buffer> q :q<CR>
+
+	if !isdirectory(g:ref_phpmanual_path)
+		if !filereadable(ref_manual_dir . 'mirror')
+			execute "!wget http://jp2.php.net/get/php_manual_ja.tar.gz/from/this/mirror -P " . ref_manual_dir 
+		endif
+
+		execute "!tar xaf " . ref_manual_dir . "mirror --directory=". ref_manual_dir
+		execute "!rm " . ref_manual_dir . "mirror"
+	endif
+
+	unlet ref_manual_dir
+
 endif
 "}}}
 
