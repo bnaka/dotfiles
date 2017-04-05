@@ -703,6 +703,9 @@ NeoBundle 'justmao945/vim-clang'
 NeoBundle 'osyo-manga/vim-snowdrop'
 NeoBundleLazy 'vim-jp/cpp-vim', { 'autoload': { 'filetypes' : [ 'c', 'cpp' ]}}
 
+NeoBundle 'tmux-plugins/vim-tmux-focus-events'
+NeoBundle 'roxma/vim-tmux-clipboard'
+
 "NeoBundle 'kien/ctrlp.vim'
 NeoBundle 'glidenote/memolist.vim'
 NeoBundle 'modsound/gips-vim'
@@ -1190,7 +1193,7 @@ if neobundle#is_installed('vim-quickrun')
 	\
 	\	"plantuml" :{ "type" : "txt/plantuml" },
 	\	"txt/plantuml" : {
-	\		"exec" : "sh $HOME/Library/Java/plantuml.sh %s:t:r",
+	\		"exec" : "sh $HOME/work/plantuml.sh %s:t",
 	\		"outputter" : "multi",
 	\		"outputter/multi/targets" : ["quickfix","buffer"],
 	\		"hook/close_buffer/enable_exit" : 1,
