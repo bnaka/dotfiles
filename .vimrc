@@ -273,9 +273,9 @@ nmap <Space>d :diffthis<CR>
 nmap <Space>c :q<CR>
 
 "カーソル位置の単語検索
-nmap <C-g><C-w> :grep "<C-R><C-W>" *.c *.cpp */*.cpp *.h */*.h *.hpp *.php *.rb *.html *.js *.as *.sql *.ddl *.csv *.xml *.txt *.nut *.sh<CR>
-nmap <C-g><C-a> :grep "<C-R><C-A>" *.c *.cpp */*.cpp *.h */*.h *.hpp *.php *.rb *.html *.js *.as *.sql *.ddl *.csv *.xml *.txt *.nut *.sh<CR>
-nmap <C-g><C-i> :grep "<C-R>/" *.c *.cpp */*.cpp *.h */*.h *.hpp *.php *.rb *.html *.js *.as *.sql *.ddl *.csv *.xml *.txt *.nut *.sh<CR>
+nmap <C-g><C-w> :grep "<C-R><C-W>" *.c *.cpp */*.cpp *.h */*.h *.hpp *.php *.rb *.html *.js *.as *.sql *.ddl *.csv *.xml *.txt *.nut *.sh *.tmpl<CR>
+nmap <C-g><C-a> :grep "<C-R><C-A>" *.c *.cpp */*.cpp *.h */*.h *.hpp *.php *.rb *.html *.js *.as *.sql *.ddl *.csv *.xml *.txt *.nut *.sh *.tmpl<CR>
+nmap <C-g><C-i> :grep "<C-R>/" *.c *.cpp */*.cpp *.h */*.h *.hpp *.php *.rb *.html *.js *.as *.sql *.ddl *.csv *.xml *.txt *.nut *.sh *.tmpl<CR>
 nmap <C-n> :cn<CR>
 nmap <C-p> :cp<CR>
 
@@ -699,7 +699,7 @@ NeoBundleLazy 'scrooloose/syntastic', { 'autoload': { 'filetypes': [ 'cs', 'csi'
 NeoBundle 'tpope/vim-dispatch'
 
 "NeoBundle 'Rip-Rip/clang_complete'
-NeoBundle 'justmao945/vim-clang'
+"NeoBundle 'justmao945/vim-clang'
 NeoBundle 'osyo-manga/vim-snowdrop'
 NeoBundleLazy 'vim-jp/cpp-vim', { 'autoload': { 'filetypes' : [ 'c', 'cpp' ]}}
 
@@ -1033,7 +1033,7 @@ if neobundle#is_installed('vim-clang')
 	" endif
     "
 	
-	let g:clang_cpp_options = '-std=c++1y -stdlib=libc++'
+	"let g:clang_cpp_options = '-std=c++1y -stdlib=libc++'
 endif
 "}}}
 
@@ -1050,19 +1050,21 @@ endif
 if neobundle#is_installed('vim-snowdrop')
 	let g:snowdrop#libclang_path = "/usr/lib64/llvm/"
 
-	let g:snowdrop#include_paths = {
-	\	"cpp" : filter(
-	\	split(glob('/usr/include/c++/*'), '\n') +
-	\	split(glob('/usr/include/*/c++/*'), '\n') +
-	\	split(glob('/usr/include/*/'), '\n'),
-	\	'isdirectory(v:val)')
-	\}
+	let g:snowdrop#include_paths = {}
+	"let g:snowdrop#include_paths = {
+	"\	"cpp" : filter(
+	"\	split(glob('/usr/include/c++/*'), '\n') +
+	"\	split(glob('/usr/include/*/c++/*'), '\n') +
+	"\	split(glob('/usr/include/*/'), '\n'),
+	"\	'isdirectory(v:val)')
+	"\}
+
+	let g:snowdrop#command_options = {}
+	"let g:snowdrop#command_options = {
+	"\	"cpp" : "-std=c++1y",
+	"\}
+
 	let g:snowdrop#goto_definition_open_cmd = "split"
-
-	let g:snowdrop#command_options = {
-	\	"cpp" : "-std=c++1y",
-	\}
-
 	autocmd FileType cpp nnoremap <C-]> :call snowdrop#goto_definition_in_cursor("edit")<CR>
 	autocmd FileType cpp nnoremap <C-w>] :call snowdrop#goto_definition_in_cursor("split")<CR>
 
@@ -1170,7 +1172,7 @@ if neobundle#is_installed('vim-quickrun')
 	\
 	\	"cpp" :{ "type" : "cpp/make" },
 	\	"cpp/make" : {
-	\		"exec" : "make all",
+	\		"exec" : "make",
 	\		"outputter" : "multi",
 	\		"outputter/multi/targets" : ["quickfix","buffer"],
 	\		"hook/close_buffer/enable_exit" : 1,
@@ -1381,18 +1383,20 @@ if neobundle#is_installed('vimshell')
 	let g:vimshell_execute_file_list['py'] = 'python'
 	call vimshell#set_execute_file('html,xhtml', 'gexe firefox')
 	
-	autocmd FileType vimshell
+	au MyAu FileType vimshell
 	\ call vimshell#altercmd#define('g', 'git')
 	\| call vimshell#altercmd#define('i', 'iexe')
 	\| call vimshell#altercmd#define('l', 'll')
 	\| call vimshell#altercmd#define('ll', 'ls -l')
 	"\| call vimshell#hook#add('chpwd', 'my_chpwd', 'g:my_chpwd')
 	
+	au MyAu FileType vimshell imap <silent><buffer> <C-d> <Plug>(vimshell_exit)
+	
 	"function! g:my_chpwd(args, context)
 	"  call vimshell#execute('ls')
 	"endfunction
 	
-	autocmd FileType int-* call s:interactive_settings()
+	au MyAu FileType int-* call s:interactive_settings()
 	function! s:interactive_settings()
 	endfunction
 endif
