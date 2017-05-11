@@ -2,3 +2,4 @@
 .local.vimrc
 tags
 *.swp
+*.pyc

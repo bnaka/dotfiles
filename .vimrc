@@ -417,16 +417,23 @@ nnoremap <Space>1 :e ++enc=iso-2022-jp-3<CR>
 " .hと.hppを新規で開いた場合に#ifdef - #endifを挿入する
 function! IncludeGuard()"{{{
    let fl = getline(1)
-   if fl =~ "^#if"
+   if fl =~ "^/"
        return
    endif
    "let gatename = "__" . substitute(toupper(expand("%:t")), "\\.", "_", "g")
-   let gatename = substitute(expand("%:t"), "\\.", "_", "g") . "__"
+   "let gatename = substitute(expand("%:t"), "\\.", "_", "g") . "__"
+   let now = localtime()
+   let getename = expand("%:t")
    normal! gg
-   execute "normal! i#ifndef " . gatename . ""
-   execute "normal! o#define " . gatename .  "\<CR>\<CR>\<CR>\<CR>\<CR>"
-   execute "normal! Go#endif   /* " . gatename . " */"
-   4
+   execute "normal! i/*! @file\t" . getename . ""
+   execute "normal! o    @brief\t\<CR>"
+   execute "normal! o    @author\tB.Naka"
+   execute "normal! o@date\t" . strftime("%Y-%m-%d")
+   execute "normal! o@note\t\<CR>"
+   execute "normal! o    $Id$"
+   execute "normal! o\<ESC>i*/"
+   execute "normal! o#pragma once"
+
 endfunction"}}}
 au MyAu BufNewFile *.h,*.hpp call IncludeGuard()
 
