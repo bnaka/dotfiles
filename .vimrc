@@ -1160,6 +1160,7 @@ if neobundle#is_installed('vim-quickrun')
 	" quickrun.vim が実行していない場合には <C-c> を呼び出す
 	nnoremap <expr><silent> <C-c> quickrun#is_running() ? quickrun#sweep_sessions() : "\<C-c>"
 	" ファイル書き込み後quickrun実行
+	au! MyAu BufWritePost *.uml :QuickRun -outputter quickfix
 	"au! BufWritePost *.[ch],*.[ch]pp :QuickRun -outputter quickfix
 	"au! BufWritePost *.[ch],*.[ch]pp :QuickRun -outputter error -outputter/error/success quickfix -outputter/error quickfix
 	"au! BufReadPost quickfix  :call feedkeys("<C-w>p")
@@ -1202,7 +1203,7 @@ if neobundle#is_installed('vim-quickrun')
 	\
 	\	"plantuml" :{ "type" : "txt/plantuml" },
 	\	"txt/plantuml" : {
-	\		"exec" : "sh $HOME/work/plantuml.sh %s:t",
+	\		"exec" : "sh $HOME/work/plantuml.sh %s",
 	\		"outputter" : "multi",
 	\		"outputter/multi/targets" : ["quickfix","buffer"],
 	\		"hook/close_buffer/enable_exit" : 1,
