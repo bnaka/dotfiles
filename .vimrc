@@ -19,6 +19,7 @@ set autoindent
 "タブスペース
 set tabstop=4
 set shiftwidth=4
+set noexpandtab
 
 "括弧の対応表示
 set showmatch
@@ -1083,7 +1084,7 @@ endif
 
 " neosnippet"{{{
 "-------------------------
-if neobundle#is_installed('neosnippet')
+if neobundle#is_installed('neosnippet.vim')
 	" Plugin key-mappings.
 	imap <C-k>     <Plug>(neosnippet_expand_or_jump)
 	smap <C-k>     <Plug>(neosnippet_expand_or_jump)
@@ -1180,7 +1181,7 @@ if neobundle#is_installed('vim-quickrun')
 	\
 	\	"cpp" :{ "type" : "cpp/make" },
 	\	"cpp/make" : {
-	\		"exec" : "make",
+	\		"exec" : "make %a",
 	\		"outputter" : "multi",
 	\		"outputter/multi/targets" : ["quickfix","buffer"],
 	\		"hook/close_buffer/enable_exit" : 1,
