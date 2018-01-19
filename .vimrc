@@ -236,6 +236,9 @@ au MyAu BufNewFile,BufRead *.ddl set filetype=sql
 " svnファイルはutf-8で開く
 au MyAu FileType svn setlocal fenc=utf-8
 
+" 新規作成時にutf-8で作成する
+au MyAu BufNewFile * set fenc=utf-8
+
 " gitcommit時に自動でDiffGitCachedを呼ぶ
 au MyAu FileType gitcommit nmap <buffer> di :DiffGitCached\|wincmd J<CR>
 au MyAu FileType gitcommit setlocal winheight=50
@@ -438,6 +441,22 @@ function! IncludeGuard()"{{{
 endfunction"}}}
 au MyAu BufNewFile *.h,*.hpp call IncludeGuard()
 
+" .cと.cppを新規で開いた場合に挿入する
+function! IncludeHeader()"{{{
+   let fl = getline(1)
+   if fl =~ "^/"
+       return
+   endif
+   let now = localtime()
+   let getename = expand("%:t")
+   let getname = expand("%:r")
+   normal! gg
+   execute "normal! i//!@file " . getename . "\<CR>"
+   execute "normal! cc#include \"" . getname . ".h\""
+
+endfunction"}}}
+au MyAu BufNewFile *.c,*.cpp call IncludeHeader()
+
 " cプリプロセッサにかける(http://vimwiki.net/?tips)
 function! CppRegion()"{{{
 	let beginmark='---beginning_of_cpp_region'
@@ -530,6 +549,16 @@ function! VisualEcho()"{{{
 	call setpos('.', pos)
 endfunction"}}}
 
+" jqで整形
+command! -nargs=? Jq call s:Jq(<f-args>)
+function! s:Jq(...)"{{{
+    if 0 == a:0
+        let l:arg = "."
+    else
+        let l:arg = a:1
+    endif
+    execute "%! jq \"" . l:arg . "\""
+endfunction"}}}
 
 "---------------------------------------------------------------------------------------
 " plugin
