@@ -231,6 +231,7 @@ au MyAu BufNewFile,BufRead *.as set filetype=actionscript
 au MyAu BufNewFile,BufRead *.tmpl set filetype=textgenshi
 " capfile ファイル認識
 au MyAu BufNewFile,BufRead Capfile,capfile set filetype=ruby
+au MyAu BufNewFile,BufRead Capfile,capfile let &l:path .= "," . $HOME . "/.gem/ruby/gems/capistrano-3.10.1/lib/" 
 " ddl ファイル認識
 au MyAu BufNewFile,BufRead *.ddl set filetype=sql
 
@@ -283,9 +284,9 @@ nmap <Space>d :diffthis<CR>
 nmap <Space>c :q<CR>
 
 "カーソル位置の単語検索
-nmap <C-g><C-w> :grep "<C-R><C-W>" *.c *.cpp */*.cpp *.h */*.h *.hpp *.php *.rb *.html *.js *.as *.sql *.ddl *.csv *.xml *.txt *.nut *.sh *.tmpl<CR>
-nmap <C-g><C-a> :grep "<C-R><C-A>" *.c *.cpp */*.cpp *.h */*.h *.hpp *.php *.rb *.html *.js *.as *.sql *.ddl *.csv *.xml *.txt *.nut *.sh *.tmpl<CR>
-nmap <C-g><C-i> :grep "<C-R>/" *.c *.cpp */*.cpp *.h */*.h *.hpp *.php *.rb *.html *.js *.as *.sql *.ddl *.csv *.xml *.txt *.nut *.sh *.tmpl<CR>
+nmap <C-g><C-w> :grep "<C-R><C-W>" *.c *.cpp */*.cpp *.h */*.h *.hpp *.php *.rb *.html *.js *.as *.sql *.ddl *.csv *.xml *.txt *.nut *.sh *.tmpl *.py <CR>
+nmap <C-g><C-a> :grep "<C-R><C-A>" *.c *.cpp */*.cpp *.h */*.h *.hpp *.php *.rb *.html *.js *.as *.sql *.ddl *.csv *.xml *.txt *.nut *.sh *.tmpl *.py <CR>
+nmap <C-g><C-i> :grep "<C-R>/" *.c *.cpp */*.cpp *.h */*.h *.hpp *.php *.rb *.html *.js *.as *.sql *.ddl *.csv *.xml *.txt *.nut *.sh *.tmpl *.py <CR>
 nmap <C-n> :cn<CR>
 nmap <C-p> :cp<CR>
 
@@ -662,6 +663,7 @@ NeoBundle 'tsukkee/unite-tag'
 NeoBundle 'osyo-manga/unite-quickfix'
 "NeoBundle 'osyo-manga/unite-airline_themes'
 NeoBundle 'kmnk/vim-unite-svn'
+NeoBundle 'kmnk/vim-unite-giti'
 NeoBundle 'heavenshell/unite-zf'
 
 NeoBundle has('lua') ? 'Shougo/neocomplete' : 'Shougo/neocomplcache'
