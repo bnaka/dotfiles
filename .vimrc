@@ -38,8 +38,12 @@ set hlsearch
 set autoread
 
 "バックアップ
+let s:backup_dir = $HOME.'/.vimtmp'
+if !isdirectory(s:backup_dir)
+	call mkdir(s:backup_dir, "p")
+endif
 set backup
-set backupdir=$HOME/.vimtmp
+let &backupdir=s:backup_dir
 
 "hidden bufferになった際にundo等の情報が消えてしまうのを抑える
 set hidden
@@ -235,6 +239,8 @@ au MyAu BufNewFile,BufRead *.ddl set filetype=sql
 
 " svnファイルはutf-8で開く
 au MyAu FileType svn setlocal fenc=utf-8
+" Makefileはutf-8で開く
+au MyAu FileType make setlocal fenc=utf-8
 
 " 新規作成時にutf-8で作成する
 au MyAu BufNewFile * set fenc=utf-8
@@ -749,6 +755,7 @@ NeoBundle 'modsound/gips-vim'
 "NeoBundle 'othree/eregex.vim'
 NeoBundle 'tomtom/tcomment_vim'
 NeoBundle 'rhysd/clever-f.vim'
+NeoBundle 'rhysd/wandbox-vim'
 "NeoBundle 'supermomonga/vimshell-kawaii'
 NeoBundle 'gregsexton/VimCalc'
 "NeoBundle 'yonchu/accelerated-smooth-scroll'
@@ -1456,6 +1463,21 @@ if neobundle#is_installed('tcomment_vim')
 endif
 "}}}
 
+" wandbox-vim"{{{
+"-------------------------
+if neobundle#is_installed('wandbox-vim')
+	" For all filetypes, use default compiler and options
+	noremap ,wb :Wandbox<CR>
+	" For specific filetypes, specify compilers to use
+	augroup wandbox-settings
+		autocmd!
+		autocmd FileType cpp noremap <buffer> ,ww :Wandbox --compiler=gcc-head,clang-head<CR>
+		autocmd FileType cpp noremap <buffer> ,wg :Wandbox --compiler=gcc-head<CR>
+		autocmd FileType cpp noremap <buffer> ,wc :Wandbox --compiler=clang-head<CR>
+	augroup END
+endif
+"}}}
+
 " caw.vim"{{{
 "-------------------------
 if neobundle#is_installed('caw.vim')
@@ -1927,6 +1949,13 @@ if neobundle#is_installed('vcscommand.vim')
 	" 数値の上で実行時にVCSDiffをリビジョン付きで呼び出す
 	au MyAu FileType svnannotate nnoremap <silent><buffer> <C-w>D :VCSDiff -c <C-r><C-w><CR>
 
+	" 数値の上で実行時にVCSAnnotateをリビジョン付きで呼び出す
+	au MyAu FileType gitannotate nnoremap <silent><buffer> <C-w>F :VCSAnnotate -r <C-r><C-w><CR>
+	" 数値の上で実行時にVCSLogをリビジョン付きで呼び出す
+	au MyAu FileType gitannotate nnoremap <silent><buffer> <C-w>L :VCSLog -r <C-r><C-w><CR>
+	" 数値の上で実行時にVCSDiffをリビジョン付きで呼び出す
+	au MyAu FileType gitannotate nnoremap <silent><buffer> <C-w>D :VCSDiff -c <C-r><C-w><CR>
+
 endif
 "}}}
 
@@ -1939,6 +1968,19 @@ if neobundle#is_installed('svn-diff.vim')
 
 endif
 "}}}
+
+" vim-fugitive "{{{
+"-------------------------
+if neobundle#is_installed('vim-fugitive')
+
+	nmap ,gs :Gstatus<CR>
+	nmap ,ga :Gwrite<CR>
+	nmap ,gc :Gcommit -v<CR>
+	nmap ,gca :Gcommit -a -v<CR>
+
+endif
+"}}}
+
 
 " agit.vim "{{{
 "-------------------------
@@ -1965,6 +2007,8 @@ if neobundle#is_installed('agit.vim')
 	"	nmap <buffer> f  :AgitGit svn fetch -p<CR>
 	"	nmap <buffer> gp :AgitGit svn dcommit
 	"endfunction
+	
+	nmap ,a :Agit<CR>
 
 	" カーソル移動で一覧と差分を更新させたくない場合は
 	let g:agit_enable_auto_show_commit = 0
