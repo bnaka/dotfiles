@@ -284,9 +284,9 @@ nmap <Space>d :diffthis<CR>
 nmap <Space>c :q<CR>
 
 "カーソル位置の単語検索
-nmap <C-g><C-w> :grep "<C-R><C-W>" *.c *.cpp */*.cpp *.h */*.h *.hpp *.php *.rb *.html *.js *.as *.sql *.ddl *.csv *.xml *.txt *.nut *.sh *.tmpl *.py <CR>
-nmap <C-g><C-a> :grep "<C-R><C-A>" *.c *.cpp */*.cpp *.h */*.h *.hpp *.php *.rb *.html *.js *.as *.sql *.ddl *.csv *.xml *.txt *.nut *.sh *.tmpl *.py <CR>
-nmap <C-g><C-i> :grep "<C-R>/" *.c *.cpp */*.cpp *.h */*.h *.hpp *.php *.rb *.html *.js *.as *.sql *.ddl *.csv *.xml *.txt *.nut *.sh *.tmpl *.py <CR>
+nmap <C-g><C-w> :grep "<C-R><C-W>" *.c *.cpp */*.cpp *.h */*.h *.hpp *.php */*.php *.rb *.html *.js *.as *.sql *.ddl *.csv *.xml *.txt *.nut *.sh *.tmpl *.py <CR>
+nmap <C-g><C-a> :grep "<C-R><C-A>" *.c *.cpp */*.cpp *.h */*.h *.hpp *.php */*.php *.rb *.html *.js *.as *.sql *.ddl *.csv *.xml *.txt *.nut *.sh *.tmpl *.py <CR>
+nmap <C-g><C-i> :grep "<C-R>/" *.c *.cpp */*.cpp *.h */*.h *.hpp *.php */*.php *.rb *.html *.js *.as *.sql *.ddl *.csv *.xml *.txt *.nut *.sh *.tmpl *.py <CR>
 nmap <C-n> :cn<CR>
 nmap <C-p> :cp<CR>
 
@@ -666,7 +666,14 @@ NeoBundle 'kmnk/vim-unite-svn'
 NeoBundle 'kmnk/vim-unite-giti'
 NeoBundle 'heavenshell/unite-zf'
 
-NeoBundle has('lua') ? 'Shougo/neocomplete' : 'Shougo/neocomplcache'
+NeoBundle 'Shougo/deoplete.nvim'
+NeoBundle 'roxma/nvim-yarp'
+NeoBundle 'roxma/vim-hug-neovim-rpc'
+let g:deoplete#enable_at_startup = 1
+NeoBundle 'Shougo/deoplete-clangx'
+NeoBundle 'lvht/phpcd.vim'
+NeoBundle 'deoplete-plugins/deoplete-jedi'
+"NeoBundle has('lua') ? 'Shougo/neocomplete' : 'Shougo/neocomplcache'
 NeoBundle 'Shougo/neosnippet.vim'
 NeoBundle 'Shougo/neosnippet-snippets'
 NeoBundle 'Shougo/neoinclude.vim'
@@ -727,7 +734,7 @@ NeoBundle 'tpope/vim-fugitive'
 NeoBundle 'gregsexton/gitv'
 NeoBundle 'idanarye/vim-merginal'
 NeoBundle 'rhysd/committia.vim'
-NeoBundle 'cohama/agit.vim'
+NeoBundle 'bnaka/agit.vim'
 
 NeoBundle 'juneedahamed/vc.vim'
 
@@ -750,6 +757,13 @@ NeoBundleLazy 'vim-jp/cpp-vim', { 'autoload': { 'filetypes' : [ 'c', 'cpp' ]}}
 
 NeoBundle 'tmux-plugins/vim-tmux-focus-events'
 NeoBundle 'roxma/vim-tmux-clipboard'
+
+"NeoBundle 'cquery-project/cquery'
+"NeoBundle 'prabirshrestha/async.vim'
+"NeoBundle 'prabirshrestha/vim-lsp'
+"NeoBundle 'prabirshrestha/asyncomplete.vim'
+"NeoBundle 'prabirshrestha/asyncomplete-lsp.vim'
+"NeoBundle 'pdavydov108/vim-lsp-cquery'
 
 "NeoBundle 'kien/ctrlp.vim'
 NeoBundle 'glidenote/memolist.vim'
@@ -775,15 +789,16 @@ NeoBundle 'gcmt/wildfire.vim'
 "NeoBundle 'jaxbot/semantic-highlight.vim'
 NeoBundle 'szw/vim-tags' 
 "NeoBundle 'haya14busa/incsearch.vim'
-NeoBundle 'shawncplus/phpcomplete.vim'
+"NeoBundle 'shawncplus/phpcomplete.vim'
 NeoBundle "aklt/plantuml-syntax"
+NeoBundle 'mileszs/ack.vim'
 
 NeoBundle 'vim-jp/vimdoc-ja'
 NeoBundle 'vim-scripts/Align'
 "NeoBundle 'vim-scripts/YankRing.vim' => yankround.vim
 "NeoBundle 'vim-scripts/a.vim' => vim-altr
 NeoBundle 'vim-scripts/vcscommand.vim'
-NeoBundle 'vim-scripts/OmniCppComplete'
+"NeoBundle 'vim-scripts/OmniCppComplete'
 NeoBundle 'vim-scripts/svn-diff.vim'
 NeoBundle 'vim-scripts/textgenshi.vim'
 " }}}
@@ -811,7 +826,7 @@ if neobundle#is_installed('unite.vim')
 	" バッファ一覧
 	nnoremap <silent> ,ub :<C-u>Unite buffer<CR>
 	" ファイル一覧
-	nnoremap <silent> ,uf :<C-u>UniteWithBufferDir -buffer-name=files file<CR>
+	nnoremap <silent> ,uf :<C-u>Unite -default-action=split file_rec/async:!/
 	" レジスタ一覧
 	nnoremap <silent> ,ur :<C-u>Unite -buffer-name=register register<CR>
 	" 最近使用したファイル一覧
@@ -1983,7 +1998,6 @@ if neobundle#is_installed('vim-fugitive')
 endif
 "}}}
 
-
 " agit.vim "{{{
 "-------------------------
 if neobundle#is_installed('agit.vim')
@@ -2010,12 +2024,26 @@ if neobundle#is_installed('agit.vim')
 	"	nmap <buffer> gp :AgitGit svn dcommit
 	"endfunction
 	
-	nmap ,a :Agit<CR>
+	nmap ,a :Agit --logpath=%:p:h<CR>
 
 	" カーソル移動で一覧と差分を更新させたくない場合は
 	let g:agit_enable_auto_show_commit = 0
 	" ログの行数
-	let g:agit_max_log_lines = 2000
+	let g:agit_max_log_lines = 300
+
+endif
+"}}}
+
+" ack.vim "{{{
+"-------------------------
+if neobundle#is_installed('ack.vim')
+
+	" grepを上書き
+	nmap <C-g><C-w> :Ack --cc --cpp --php --ruby --html --sql --python --js --shell --type-set=txt:ext:txt,csv,tmpl,nut --txt "<C-R><C-W>"<CR>
+	nmap <C-g><C-a> :Ack --cc --cpp --php --ruby --html --sql --python --js --shell --type-set=txt:ext:txt,csv,tmpl,nut --txt "<C-R><C-A>"<CR>
+	nmap <C-g><C-j> :exe "Ack -w --cc --cpp --php --ruby --html --sql --python --js --shell --type-set=txt:ext:txt,csv,tmpl,nut --txt ". substitute("<C-R>/","[\<\>]","","g")<CR>
+	nmap <C-g><C-i> :Ack --cc --cpp --php --ruby --html --sql --python --js --shell --type-set=txt:ext:txt,csv,tmpl,nut --txt "<C-R>/"<CR>
+
 
 endif
 "}}}
@@ -2070,6 +2098,32 @@ nmap gb :exe "Cbreak " . expand("%:p") . ":" . line(".")<CR>
 nmap ge :exe "Cclear " . expand("%:p") . ":" . line(".")<CR>
 nmap gp :exe "Cprint " . substitute(expand('<cword>'), "," , "", "g")<CR>
 nmap gP :exe "Cprint " . substitute(expand('<cWORD>'), "," , "", "g")<CR>
+"}}}
+
+" cquery "{{{
+"-------------------------
+if executable('cquery')
+   au User lsp_setup call lsp#register_server({
+      \ 'name': 'cquery',
+      \ 'cmd': {server_info->['cquery']},
+      \ 'root_uri': {server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), 'compile_commands.json'))},
+      \ 'initialization_options': { 'cacheDirectory': $HOME.'.cache/cquery' },
+      \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
+      \ })
+   " let g:lsp_signs_enabled = 1         " enable signs
+   " let g:lsp_diagnostics_echo_cursor = 1 " enable echo under cursor when in normal mode
+   "
+   " let g:lsp_signs_error = {'text': '✗'}
+   " let g:lsp_signs_warning = {'text': '‼'}
+   "
+   " let g:asyncomplete_completion_delay=10
+   "
+   " """"" asyncomplete.vim
+	" inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
+	" inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+	" inoremap <expr> <cr>    pumvisible() ? "\<C-y>" : "\<cr>"
+	" autocmd! CompleteDone * if pumvisible() == 0 | pclose | endif
+endif
 "}}}
 
 " vim:set foldmethod=marker commentstring="%s :
