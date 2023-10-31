@@ -187,6 +187,10 @@ let php_parent_error_close = 1
 
 let g:sql_type_default='mysql'
 
+" python
+let g:python3_host_prog='/usr/bin/python3'
+let g:pythonx_host_prog='/usr/bin/python3'
+
 "---------------------------------------------------------------------------------------
 " オプション設定
 "---------------------------------------------------------------------------------------
@@ -212,7 +216,7 @@ augroup MyAu"{{{
 augroup END"}}}
 
 "カレントディレクトリの移動
-au MyAu BufEnter *.nut,*.sh,*.conf,*.log,*.vim,*.txt,*.c,*.cpp,*.cc,*.h,*.hpp,*.inc,*.tpp,*.pl,*.py,*.php,*.rb,*.erb,*.js,*.css,*.html,*.phtml,*.xml,*.xsl,*.sql,*.ddl,*.csv,*.tmpl,*.script,*.as,*.tpl,*.ctp,*.cs,*.json,*.ini,*.mk,*.md,[A-Z]*file execute ":lcd " . expand("%:p:h")
+au MyAu BufEnter *.nut,*.sh,*.conf,*.log,*.vim,*.txt,*.c,*.cpp,*.cc,*.h,*.hpp,*.inc,*.tpp,*.ipp,*.pl,*.py,*.php,*.rb,*.erb,*.rake,*.java,*.js,*.css,*.html,*.phtml,*.xml,*.xsl,*.sql,*.ddl,*.csv,*.tmpl,*.script,*.as,*.tpl,*.ctp,*.twig,*.cs,*.json,*.ini,*.mk,*.md,[A-Z]*file execute ":lcd " . expand("%:p:h")
 
 " 前回終了したカーソル行に移動
 au MyAu BufReadPost * if !&diff && line("'\"") > 0 && line("'\"") <= line("$") | exe "normal g`\"" | endif
@@ -222,7 +226,7 @@ au MyAu QuickfixCmdPost make,grep,grepadd,vimgrep copen
 au MyAu QuickfixCmdPost l* lopen
 
 " 拡張cppファイル認識
-au MyAu BufNewFile,BufRead *.inc,*.tpp set filetype=cpp
+au MyAu BufNewFile,BufRead *.inc,*.tpp,*.ipp set filetype=cpp
 " csファイル認識
 au MyAu FileType csharp setlocal ft=cs
 " actionscriptファイル認識
@@ -284,9 +288,10 @@ nmap <Space>d :diffthis<CR>
 nmap <Space>c :q<CR>
 
 "カーソル位置の単語検索
-nmap <C-g><C-w> :grep "<C-R><C-W>" *.c *.cpp */*.cpp *.h */*.h *.hpp *.php */*.php *.rb *.html *.js *.as *.sql *.ddl *.csv *.xml *.txt *.nut *.sh *.tmpl *.py <CR>
-nmap <C-g><C-a> :grep "<C-R><C-A>" *.c *.cpp */*.cpp *.h */*.h *.hpp *.php */*.php *.rb *.html *.js *.as *.sql *.ddl *.csv *.xml *.txt *.nut *.sh *.tmpl *.py <CR>
-nmap <C-g><C-i> :grep "<C-R>/" *.c *.cpp */*.cpp *.h */*.h *.hpp *.php */*.php *.rb *.html *.js *.as *.sql *.ddl *.csv *.xml *.txt *.nut *.sh *.tmpl *.py <CR>
+nmap <C-g><C-w> :grep "<C-R><C-W>" *.c *.cpp */*.cpp *.h */*.h *.hpp *.ipp *.tpp *.php */*.php *.rb *.html *.js *.as *.sql *.ddl *.csv *.xml *.txt *.nut *.sh *.tmpl *.py <CR>
+nmap <C-g><C-a> :grep "<C-R><C-A>" *.c *.cpp */*.cpp *.h */*.h *.hpp *.ipp *.tpp *.php */*.php *.rb *.html *.js *.as *.sql *.ddl *.csv *.xml *.txt *.nut *.sh *.tmpl *.py <CR>
+nmap <C-g><C-i> :grep "<C-R>/" *.c *.cpp */*.cpp *.h */*.h *.hpp *.ipp *.tpp *.php */*.php *.rb *.html *.js *.as *.sql *.ddl *.csv *.xml *.txt *.nut *.sh *.tmpl *.py <CR>
+nmap <C-g>/ :grep "<C-R>/" %:t<CR>
 nmap <C-n> :cn<CR>
 nmap <C-p> :cp<CR>
 
@@ -653,155 +658,164 @@ endif
  " My Bundles here:
  " Refer to |:NeoBundle-examples|.
  " Note: You don't set neobundle setting in .gvimrc!
-" My Bundle {{{
-NeoBundle 'Shougo/unite.vim'
-NeoBundle 'Shougo/neomru.vim'
-NeoBundle 'Shougo/unite-build'
-NeoBundle 'Shougo/unite-outline'
-NeoBundle 'ujihisa/unite-locate'
-NeoBundle 'tsukkee/unite-tag'
-NeoBundle 'osyo-manga/unite-quickfix'
-"NeoBundle 'osyo-manga/unite-airline_themes'
-NeoBundle 'kmnk/vim-unite-svn'
-NeoBundle 'kmnk/vim-unite-giti'
-NeoBundle 'heavenshell/unite-zf'
+	" My Bundle {{{
+	NeoBundle 'Shougo/unite.vim'
+	NeoBundle 'Shougo/neomru.vim'
+	NeoBundle 'Shougo/unite-build'
+	NeoBundle 'Shougo/unite-outline'
+	NeoBundle 'ujihisa/unite-locate'
+	NeoBundle 'tsukkee/unite-tag'
+	NeoBundle 'osyo-manga/unite-quickfix'
+	"NeoBundle 'osyo-manga/unite-airline_themes'
+	NeoBundle 'kmnk/vim-unite-svn'
+	NeoBundle 'kmnk/vim-unite-giti'
+	NeoBundle 'heavenshell/unite-zf'
 
-NeoBundle 'Shougo/deoplete.nvim'
-NeoBundle 'roxma/nvim-yarp'
-NeoBundle 'roxma/vim-hug-neovim-rpc'
-let g:deoplete#enable_at_startup = 1
-NeoBundle 'Shougo/deoplete-clangx'
-NeoBundle 'lvht/phpcd.vim'
-NeoBundle 'deoplete-plugins/deoplete-jedi'
-"NeoBundle has('lua') ? 'Shougo/neocomplete' : 'Shougo/neocomplcache'
-NeoBundle 'Shougo/neosnippet.vim'
-NeoBundle 'Shougo/neosnippet-snippets'
-NeoBundle 'Shougo/neoinclude.vim'
-NeoBundle 'Shougo/vimshell'
-NeoBundle 'Shougo/vimfiler'
-NeoBundle 'Shougo/context_filetype.vim'
+	NeoBundle 'Shougo/deoplete.nvim'
+	NeoBundle 'roxma/nvim-yarp'
+	NeoBundle 'roxma/vim-hug-neovim-rpc'
+	"let g:deoplete#enable_at_startup = 1
+	NeoBundle 'Shougo/deoplete-clangx'
+	"NeoBundle 'xavierd/clang_complete'
+	"NeoBundle 'zchee/deoplete-clang'
+	"NeoBundle 'lvht/phpcd.vim'
+	"NeoBundle 'php-vim/phpcd.vim'
+	"NeoBundle 'deoplete-plugins/deoplete-jedi'
+	" NeoBundle has('lua') ? 'Shougo/neocomplete' : 'Shougo/neocomplcache'
+	NeoBundle 'Shougo/neosnippet.vim'
+	NeoBundle 'Shougo/neosnippet-snippets'
+	NeoBundle 'Shougo/neoinclude.vim'
+	NeoBundle 'Shougo/vimshell'
+	NeoBundle 'Shougo/vimfiler'
+	NeoBundle 'Shougo/context_filetype.vim'
 
-NeoBundle 'thinca/vim-quickrun'
-NeoBundle 'osyo-manga/shabadou.vim'
-NeoBundle 'osyo-manga/vim-watchdogs'
-NeoBundle 'dannyob/quickfixstatus'
-NeoBundle 'cohama/vim-hier'
+	NeoBundle 'thinca/vim-quickrun'
+	NeoBundle 'osyo-manga/shabadou.vim'
+	NeoBundle 'osyo-manga/vim-watchdogs'
+	NeoBundle 'dannyob/quickfixstatus'
+	NeoBundle 'cohama/vim-hier'
 
-NeoBundle 'mattn/webapi-vim'
-NeoBundle 'mattn/vdbi-vim'
-NeoBundle 'mattn/excelview-vim'
+	NeoBundle 'mattn/webapi-vim'
+	NeoBundle 'mattn/vdbi-vim'
+	NeoBundle 'mattn/excelview-vim'
 
-NeoBundle 'thinca/vim-ref'
-NeoBundle 'thinca/vim-splash'
-"NeoBundle 'thinca/vim-singleton'
-NeoBundle 'thinca/vim-localrc'
-NeoBundle 'thinca/vim-visualstar'
-NeoBundle 'thinca/vim-qfreplace'
+	NeoBundle 'thinca/vim-ref'
+	NeoBundle 'thinca/vim-splash'
+	"NeoBundle 'thinca/vim-singleton'
+	NeoBundle 'thinca/vim-localrc'
+	NeoBundle 'thinca/vim-visualstar'
+	NeoBundle 'thinca/vim-qfreplace'
 
-NeoBundle 'kana/vim-submode'
-NeoBundle 'kana/vim-textobj-user'
-NeoBundle 'osyo-manga/vim-textobj-multiblock'
-NeoBundle 'osyo-manga/vim-textobj-blockwise'
-NeoBundle 'kana/vim-smartchr'
-NeoBundle 'kana/vim-smartinput'
-NeoBundle 'cohama/vim-smartinput-endwise'
-NeoBundle 'kana/vim-altr'
-NeoBundle 'tpope/vim-surround'
-NeoBundle 'haya14busa/vim-metarepeat'
+	NeoBundle 'kana/vim-submode'
+	NeoBundle 'kana/vim-textobj-user'
+	NeoBundle 'osyo-manga/vim-textobj-multiblock'
+	NeoBundle 'osyo-manga/vim-textobj-blockwise'
+	NeoBundle 'kana/vim-smartchr'
+	NeoBundle 'kana/vim-smartinput'
+	NeoBundle 'cohama/vim-smartinput-endwise'
+	NeoBundle 'kana/vim-altr'
+	NeoBundle 'tpope/vim-surround'
+	NeoBundle 'haya14busa/vim-metarepeat'
+	NeoBundle 'kana/vim-operator-user'
 
-NeoBundle 'tyru/capture.vim'
-"NeoBundle 'tyru/caw.vim'
-NeoBundle 'tyru/current-func-info.vim'
+	NeoBundle 'tyru/capture.vim'
+	"NeoBundle 'tyru/caw.vim'
+	NeoBundle 'tyru/current-func-info.vim'
+	NeoBundle 'tyru/operator-camelize.vim'
 
-NeoBundle 'osyo-manga/vim-precious'
-NeoBundle 'osyo-manga/vim-anzu'
-NeoBundle 'osyo-manga/vim-automatic'
-NeoBundle 'osyo-manga/vim-fancy'
-NeoBundle 'osyo-manga/vim-over'
-NeoBundle 'osyo-manga/vim-stargate'
-NeoBundle 'osyo-manga/vim-marching'
-NeoBundle 'osyo-manga/vim-operator-blockwise'
+	"NeoBundle 'osyo-manga/vim-precious'
+	NeoBundle 'osyo-manga/vim-anzu'
+	NeoBundle 'osyo-manga/vim-automatic'
+	NeoBundle 'osyo-manga/vim-fancy'
+	NeoBundle 'osyo-manga/vim-over'
+	NeoBundle 'osyo-manga/vim-stargate'
+	NeoBundle 'osyo-manga/vim-marching'
+	NeoBundle 'osyo-manga/vim-operator-blockwise'
 
-NeoBundle 't9md/vim-quickhl'
-NeoBundle 't9md/vim-choosewin'
+	NeoBundle 't9md/vim-quickhl'
+	NeoBundle 't9md/vim-choosewin'
 
-"NeoBundle 'alpaca-tc/alpaca_powertabline'
-NeoBundle 'powerline/powerline', { 'rtp' : 'powerline/bindings/vim/'}
-"NeoBundle 'bling/vim-airline'
-NeoBundle 'itchyny/lightline.vim'
+	"NeoBundle 'alpaca-tc/alpaca_powertabline'
+	NeoBundle 'powerline/powerline', { 'rtp' : 'powerline/bindings/vim/'}
+	"NeoBundle 'bling/vim-airline'
+	NeoBundle 'itchyny/lightline.vim'
 
-NeoBundle 'tpope/vim-fugitive'
-NeoBundle 'gregsexton/gitv'
-NeoBundle 'idanarye/vim-merginal'
-NeoBundle 'rhysd/committia.vim'
-NeoBundle 'bnaka/agit.vim'
+	NeoBundle 'tpope/vim-fugitive'
+	NeoBundle 'gregsexton/gitv'
+	NeoBundle 'idanarye/vim-merginal'
+	NeoBundle 'rhysd/committia.vim'
+	NeoBundle 'bnaka/agit.vim', 'custom'
 
-NeoBundle 'juneedahamed/vc.vim'
+	NeoBundle 'juneedahamed/vc.vim'
 
-NeoBundleLazy 'OmniSharp/omnisharp-vim', {
-\   'autoload': { 'filetypes': [ 'cs', 'csi', 'csx' ] },
-\   'build': {
-\     'windows' : 'msbuild server/OmniSharp.sln',
-\     'mac': 'xbuild server/OmniSharp.sln',
-\     'unix': 'xbuild server/OmniSharp.sln',
-\   },
-\ }
-"NeoBundleLazy 'OrangeT/vim-csharp', { 'autoload': { 'filetypes': [ 'cs', 'csi', 'csx' ] } }
-NeoBundleLazy 'scrooloose/syntastic', { 'autoload': { 'filetypes': [ 'cs', 'csi', 'csx', 'javascript', 'c', 'cpp' ] } }
-NeoBundle 'tpope/vim-dispatch'
+	NeoBundleLazy 'OmniSharp/omnisharp-vim', {
+	\   'autoload': { 'filetypes': [ 'cs', 'csi', 'csx' ] },
+	\   'build': {
+	\     'windows' : 'msbuild server/OmniSharp.sln',
+	\     'mac': 'xbuild server/OmniSharp.sln',
+	\     'unix': 'xbuild server/OmniSharp.sln',
+	\   },
+	\ }
+	"NeoBundleLazy 'OrangeT/vim-csharp', { 'autoload': { 'filetypes': [ 'cs', 'csi', 'csx' ] } }
+	NeoBundleLazy 'scrooloose/syntastic', { 'autoload': { 'filetypes': [ 'cs', 'csi', 'csx', 'javascript', 'c', 'cpp' ] } }
+	NeoBundle 'tpope/vim-dispatch'
 
-"NeoBundle 'Rip-Rip/clang_complete'
-"NeoBundle 'justmao945/vim-clang'
-NeoBundle 'osyo-manga/vim-snowdrop'
-NeoBundleLazy 'vim-jp/cpp-vim', { 'autoload': { 'filetypes' : [ 'c', 'cpp' ]}}
+	"NeoBundle 'Rip-Rip/clang_complete'
+	"NeoBundle 'justmao945/vim-clang'
+	NeoBundleLazy 'rhysd/vim-clang-format', { 'autoload': { 'filetypes': [ 'javascript', 'c', 'cpp' ] } }
+	NeoBundle 'osyo-manga/vim-snowdrop'
+	NeoBundleLazy 'vim-jp/cpp-vim', { 'autoload': { 'filetypes' : [ 'c', 'cpp' ]}}
 
-NeoBundle 'tmux-plugins/vim-tmux-focus-events'
-NeoBundle 'roxma/vim-tmux-clipboard'
+	NeoBundle 'tmux-plugins/vim-tmux-focus-events'
+	NeoBundle 'roxma/vim-tmux-clipboard'
 
-"NeoBundle 'cquery-project/cquery'
-"NeoBundle 'prabirshrestha/async.vim'
-"NeoBundle 'prabirshrestha/vim-lsp'
-"NeoBundle 'prabirshrestha/asyncomplete.vim'
-"NeoBundle 'prabirshrestha/asyncomplete-lsp.vim'
-"NeoBundle 'pdavydov108/vim-lsp-cquery'
+	"NeoBundle 'cquery-project/cquery'
+	"NeoBundle 'prabirshrestha/async.vim'
+	"NeoBundle 'prabirshrestha/vim-lsp'
+	"NeoBundle 'prabirshrestha/asyncomplete.vim'
+	"NeoBundle 'prabirshrestha/asyncomplete-lsp.vim'
+	"NeoBundle 'pdavydov108/vim-lsp-cquery'
 
-"NeoBundle 'kien/ctrlp.vim'
-NeoBundle 'glidenote/memolist.vim'
-NeoBundle 'modsound/gips-vim'
-"NeoBundle 'othree/eregex.vim'
-NeoBundle 'tomtom/tcomment_vim'
-NeoBundle 'rhysd/clever-f.vim'
-NeoBundle 'rhysd/wandbox-vim'
-"NeoBundle 'supermomonga/vimshell-kawaii'
-NeoBundle 'gregsexton/VimCalc'
-"NeoBundle 'yonchu/accelerated-smooth-scroll'
-NeoBundle 'deris/vim-rengbang'
-NeoBundle 'LeafCage/yankround.vim'
-NeoBundle 'terryma/vim-expand-region'
-NeoBundle 'AndrewRadev/linediff.vim'
-NeoBundle 'AndrewRadev/switch.vim'
-NeoBundle 'mhinz/vim-signify'
-NeoBundle 'itchyny/calendar.vim'
-NeoBundle 'cocopon/colorswatch.vim'
-NeoBundle 'dyng/ctrlsf.vim'
-NeoBundle 'gcmt/wildfire.vim'
-"NeoBundle 'rbtnn/rabbit-ui.vim'
-"NeoBundle 'jaxbot/semantic-highlight.vim'
-NeoBundle 'szw/vim-tags' 
-"NeoBundle 'haya14busa/incsearch.vim'
-"NeoBundle 'shawncplus/phpcomplete.vim'
-NeoBundle "aklt/plantuml-syntax"
-NeoBundle 'mileszs/ack.vim'
+	"NeoBundle 'kien/ctrlp.vim'
+	NeoBundle 'glidenote/memolist.vim'
+	NeoBundle 'modsound/gips-vim'
+	"NeoBundle 'othree/eregex.vim'
+	NeoBundle 'tomtom/tcomment_vim'
+	NeoBundle 'rhysd/clever-f.vim'
+	NeoBundle 'rhysd/wandbox-vim'
+	"NeoBundle 'supermomonga/vimshell-kawaii'
+	NeoBundle 'gregsexton/VimCalc'
+	"NeoBundle 'yonchu/accelerated-smooth-scroll'
+	NeoBundle 'deris/vim-rengbang'
+	NeoBundle 'LeafCage/yankround.vim'
+	NeoBundle 'terryma/vim-expand-region'
+	NeoBundle 'AndrewRadev/linediff.vim'
+	NeoBundle 'AndrewRadev/switch.vim'
+	NeoBundle 'mhinz/vim-signify'
+	NeoBundle 'itchyny/calendar.vim'
+	NeoBundle 'cocopon/colorswatch.vim'
+	NeoBundle 'dyng/ctrlsf.vim'
+	NeoBundle 'gcmt/wildfire.vim'
+	"NeoBundle 'rbtnn/rabbit-ui.vim'
+	"NeoBundle 'jaxbot/semantic-highlight.vim'
+	NeoBundle 'szw/vim-tags' 
+	"NeoBundle 'haya14busa/incsearch.vim'
+	"NeoBundle 'shawncplus/phpcomplete.vim'
+	NeoBundle "aklt/plantuml-syntax"
+	NeoBundle 'mileszs/ack.vim'
 
-NeoBundle 'vim-jp/vimdoc-ja'
-NeoBundle 'vim-scripts/Align'
-"NeoBundle 'vim-scripts/YankRing.vim' => yankround.vim
-"NeoBundle 'vim-scripts/a.vim' => vim-altr
-NeoBundle 'vim-scripts/vcscommand.vim'
-"NeoBundle 'vim-scripts/OmniCppComplete'
-NeoBundle 'vim-scripts/svn-diff.vim'
-NeoBundle 'vim-scripts/textgenshi.vim'
-" }}}
+	NeoBundle 'vim-jp/vimdoc-ja'
+	NeoBundle 'vim-scripts/Align'
+	"NeoBundle 'vim-scripts/YankRing.vim' => yankround.vim
+	"NeoBundle 'vim-scripts/a.vim' => vim-altr
+	NeoBundle 'vim-scripts/vcscommand.vim'
+	"NeoBundle 'vim-scripts/OmniCppComplete'
+	NeoBundle 'vim-scripts/svn-diff.vim'
+	NeoBundle 'vim-scripts/textgenshi.vim'
+	"NeoBundle 'vim-scripts/DirDiff.vim'
+	"NeoBundle 'will133/vim-dirdiff'
+	NeoBundle 'will133/vim-dirdiff', '81f9410'
+	" }}}
 
 call neobundle#end()
 
@@ -1059,6 +1073,266 @@ if neobundle#is_installed('neocomplete')
 endif
 "}}}
 
+" deoplete"{{{
+"-------------------------
+if neobundle#is_installed('deoplete.nvim')
+	" 補完ウィンドウの設定
+	set completeopt=menuone
+
+	" Disable AutoComplPop.
+	let g:acp_enableAtStartup = 0
+
+	" 起動時に有効化
+	let g:deoplete#enable_at_startup = 1
+
+	let s:deoplete_custom_option = {
+		  \ 'ignore_case': &ignorecase,
+		  \ 'smart_case': &smartcase,
+		  \ 'camel_case': v:true,
+		  \ 'min_pattern_length': 1,
+		  \ 'min_keyword_length': 3,
+		  \ 'max_list': 10000,
+		  \ 'num_processes': 3,
+		  \ 'auto_complete': v:true,
+		  \ 'auto_complete_delay': 0,
+		  \ 'auto_complete_popup': 'auto',
+		  \ 'auto_refresh_delay': 50,
+		  \ 'complete_suffix': v:true,
+		  \ 'on_insert_enter': v:true,
+		  \ 'on_text_changed_i': v:true,
+		  \ 'prev_completion_mode': 'none',
+		  \ 'profile': v:false,
+		  \ 'refresh_always': v:true,
+		  \ 'refresh_backspace': v:true,
+		  \ 'skip_multibyte': v:false,
+		  \ }
+	call deoplete#custom#option(s:deoplete_custom_option)
+
+	call deoplete#custom#var('omni', 'input_patterns', {
+		\ 'php': '\w+|[^. \t]->\w*|\w+::\w*',
+		\})
+
+	" Use smartcase.
+	"let g:deoplete#enable_ignore_case = 1
+	"let g:deoplete#enable_smart_case = 1
+
+	" minimum
+	"let g:deoplete#sources#syntax#min_keyword_length = 3
+
+	" Define keyword.
+	"if !exists('g:deoplete#keyword_patterns')
+	"    let g:deoplete#keyword_patterns = {}
+	"endif
+	"let g:deoplete#keyword_patterns['default'] = '\h\w*'
+
+	if !exists('g:deoplete#sources#dictionary#dictionaries')
+	  let g:deoplete#sources#dictionary#dictionaries = {}
+	endif
+	let dict = g:deoplete#sources#dictionary#dictionaries
+
+	" 補完しないバッファ
+	let g:deoplete#sources#buffer#disabled_pattern = '\.php\|\.log\|\.log\.\|\.jax\|Log.txt'
+
+	"tabで補完候補の選択を行う
+	inoremap <expr><TAB> pumvisible() ? "\<Down>" : "\<TAB>"
+	inoremap <expr><S-TAB> pumvisible() ? "\<Up>" : "\<S-TAB>"
+
+	" Plugin key-mappings.
+	inoremap <expr><C-g>     deoplete#undo_completion()
+	inoremap <expr><C-l>     deoplete#complete_common_string()
+
+	" <C-h>, <BS>: close popup and delete backword char.
+	inoremap <expr><C-h> deoplete#smart_close_popup()."\<C-h>"
+	inoremap <expr><BS> deoplete#smart_close_popup()."\<C-h>"
+	inoremap <expr><C-y>  deoplete#close_popup()
+	inoremap <expr><C-e>  deoplete#cancel_popup()
+
+	" Enable omni completion.
+	autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
+	autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+	autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+	autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
+	autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+	if neobundle#is_installed('omnisharp-vim')
+		autocmd FileType cs setlocal omnifunc=OmniSharp#Complete
+	endif
+	" autocmd FileType php setlocal omnifunc=OmniSharp#Complete
+
+	" Enable heavy omni completion.
+	" let g:deoplete#force_overwrite_completefunc = 1
+	" if !exists('g:deoplete#sources#omni#input_patterns')
+	"   let g:deoplete#sources#omni#input_patterns = {}
+	" endif
+	" if !exists('g:deoplete#force_omni_input_patterns')
+	"   let g:deoplete#force_omni_input_patterns = {}
+	" endif
+	" let g:deoplete#sources#omni#input_patterns.php =
+	" \ '[^. \t]->\%(\h\w*\)\?\|\h\w*::\%(\h\w*\)\?'
+	" let g:deoplete#sources#omni#input_patterns.php =
+	" \ '\h\w*\|[^. \t]->\%(\h\w*\)\?\|\h\w*::\%(\h\w*\)\?'
+	" let g:deoplete#sources#omni#input_patterns.c =
+	" \ '[^.[:digit:] *\t]\%(\.\|->\)\%(\h\w*\)\?'
+	" let g:deoplete#sources#omni#input_patterns.cpp =
+	" \ '[^.[:digit:] *\t]\%(\.\|->\)\%(\h\w*\)\?\|\h\w*::\%(\h\w*\)\?'
+	" let g:deoplete#force_omni_input_patterns.c =
+	" 			\ '[^.[:digit:] *\t]\%(\.\|->\)\w*'
+	" let g:deoplete#force_omni_input_patterns.cpp =
+	" 			\ '[^.[:digit:] *\t]\%(\.\|->\)\w*\|\h\w*::\w*'
+	" let g:deoplete#sources#omni#input_patterns.cs = 
+	" \'.*[^=\);]'
+
+	" For perlomni.vim setting.
+	" https://github.com/c9s/perlomni.vim
+	"let g:deoplete#sources#omni#input_patterns.perl = '\h\w*->\h\w*\|\h\w*::'
+	
+endif
+"}}}
+
+" a deoplete.nvim"{{{
+"-------------------------
+if neobundle#is_installed('adeoplete.nvim')
+	" 補完ウィンドウの設定
+	set completeopt=menuone
+
+	" Disable AutoComplPop.
+	let g:acp_enableAtStartup = 0
+
+	let s:default_ignore_sources = ['ale', 'around', 'denite', 'file_include', 'floaterm', 'lsp', 'member', 'omni', 'tag']
+	let s:deoplete_custom_option = {
+		  \ 'auto_complete': v:true,
+		  \ 'auto_complete_delay': 0,
+		  \ 'auto_complete_popup': 'auto',
+		  \ 'auto_refresh_delay': 50,
+		  \ 'camel_case': v:true,
+		  \ 'check_stderr': v:false,
+		  \ 'complete_suffix': v:true,
+		  \ 'ignore_case': &ignorecase,
+		  \ 'ignore_sources': {
+		  \   '_': ['ale', 'around', 'floaterm', 'lsp', 'member', 'omni', 'tag'],
+		  \   'c': s:default_ignore_sources,
+		  \   'cpp': s:default_ignore_sources,
+		  \   'dockerfile': s:default_ignore_sources,
+		  \   'go': s:default_ignore_sources+['buffer'],
+		  \   'javascript': s:default_ignore_sources,
+		  \   'lua': s:default_ignore_sources,
+		  \   'objc': s:default_ignore_sources+['buffer'],
+		  \   'proto': s:default_ignore_sources,
+		  \   'python': s:default_ignore_sources,
+		  \   'rust': s:default_ignore_sources,
+		  \   'sh': s:default_ignore_sources,
+		  \   'swift': s:default_ignore_sources,
+		  \   'TelescopePrompt': s:default_ignore_sources+['buffer', 'neosnippet'],
+		  \   'typescript': s:default_ignore_sources,
+		  \   'yaml': s:default_ignore_sources,
+		  \   'yaml.docker-compose': s:default_ignore_sources+['buffer'],
+		  \   'zsh': s:default_ignore_sources,
+		  \ },
+		  \ 'max_list': 10000,
+		  \ 'min_pattern_length': 1,
+		  \ 'min_keyword_length': 3,
+		  \ 'num_processes': 3,
+		  \ 'on_insert_enter': v:true,
+		  \ 'on_text_changed_i': v:true,
+		  \ 'prev_completion_mode': 'none',
+		  \ 'profile': v:false,
+		  \ 'refresh_always': v:true,
+		  \ 'refresh_backspace': v:true,
+		  \ 'skip_multibyte': v:false,
+		  \ 'smart_case': &smartcase,
+		  \ 'trigger_key': v:char,
+		  \ }
+	call deoplete#custom#option(s:deoplete_custom_option)
+	"Gautocmdft python call deoplete#custom#option('ignore_sources', { 'python': ['ale', 'around', 'dictionary', 'floaterm', 'lsp', 'member', 'omni', 'tag'] })
+	call deoplete#custom#source('_', 'matchers', ['matcher_cpsm_internal'])  " matcher_fuzzy, matcher_full_fuzzy, matcher_cpsm, matcher_head, matcher_length
+	call deoplete#custom#source('_', 'sorters', ['sorter_rand', 'sorter_word'])  " 'sorter_word', 'sorter_rand'
+	call deoplete#custom#source('_', 'converters', ['converter_auto_paren', 'converter_remove_overlap'])
+
+	call deoplete#custom#source('buffer', 'rank', 100)
+	call deoplete#custom#source('file', 'rank', 150)
+	call deoplete#custom#source('file', 'enable_buffer_path', v:true)
+	call deoplete#custom#source('file', 'force_completion_length', -1)
+
+	" call deoplete#custom#source('go', 'auto_refresh_delay', 1000)
+	" call deoplete#custom#source('go', 'matchers', ['matcher_fuzzy', 'matcher_length'])
+	" call deoplete#custom#source('go', 'sorters', ['sorter_word'])
+	" call deoplete#custom#source('go', 'is_debug_enabled', v:true)
+
+	"call deoplete#custom#source('LanguageClient', 'sorters', [])
+	"call deoplete#custom#source('LanguageClient', 'max_candidates', 1000)
+	"call deoplete#custom#source('LanguageClient', 'converters', ['converter_auto_paren_lsp', 'converter_auto_paren', 'converter_remove_overlap'])
+	"Gautocmdft json,jsonschema,yaml call deoplete#custom#source('LanguageClientInternal', 'min_pattern_length', 0)
+
+	"call deoplete#custom#source('asm', 'rank', 1000)
+	call deoplete#custom#source('python', 'refresh_always', v:false)
+
+	call deoplete#custom#source('neosnippet', 'rank', 500)
+	call deoplete#custom#source('neosnippet', 'converters', ['converter_remove_overlap'])
+
+	call deoplete#custom#source('zsh', 'filetypes', ['sh', 'zsh'])
+	
+	" 補完しないバッファ
+	let g:deoplete#sources#buffer#disabled_pattern = '\.log\|\.log\.\|\.jax\|Log.txt'
+
+	"tabで補完候補の選択を行う
+	inoremap <expr><TAB> pumvisible() ? "\<Down>" : "\<TAB>"
+	inoremap <expr><S-TAB> pumvisible() ? "\<Up>" : "\<S-TAB>"
+
+	" Plugin key-mappings.
+	inoremap <expr><C-g>     deoplete#undo_completion()
+	inoremap <expr><C-l>     deoplete#complete_common_string()
+
+	" <C-h>, <BS>: close popup and delete backword char.
+	inoremap <expr><C-h> deoplete#smart_close_popup()."\<C-h>"
+	inoremap <expr><BS> deoplete#smart_close_popup()."\<C-h>"
+	inoremap <expr><C-y>  deoplete#close_popup()
+	inoremap <expr><C-e>  deoplete#cancel_popup()
+	
+	" Enable heavy omni completion.
+	let g:deoplete#force_overwrite_completefunc = 1
+	if !exists('g:deoplete#sources#omni#input_patterns')
+	  let g:deoplete#sources#omni#input_patterns = {}
+	endif
+	if !exists('g:deoplete#force_omni_input_patterns')
+	  let g:deoplete#force_omni_input_patterns = {}
+	endif
+	" let g:deoplete#sources#omni#input_patterns.php =
+	" \ '[^. \t]->\%(\h\w*\)\?\|\h\w*::\%(\h\w*\)\?'
+	" let g:deoplete#sources#omni#input_patterns.php =
+	" \ '\h\w*\|[^. \t]->\%(\h\w*\)\?\|\h\w*::\%(\h\w*\)\?'
+	let g:deoplete#sources#omni#input_patterns.c =
+	\ '[^.[:digit:] *\t]\%(\.\|->\)\%(\h\w*\)\?'
+	let g:deoplete#sources#omni#input_patterns.cpp =
+	\ '[^.[:digit:] *\t]\%(\.\|->\)\%(\h\w*\)\?\|\h\w*::\%(\h\w*\)\?'
+	" let g:deoplete#force_omni_input_patterns.c =
+	" 			\ '[^.[:digit:] *\t]\%(\.\|->\)\w*'
+	" let g:deoplete#force_omni_input_patterns.cpp =
+	" 			\ '[^.[:digit:] *\t]\%(\.\|->\)\w*\|\h\w*::\w*'
+	let g:deoplete#sources#omni#input_patterns.cs = 
+	\'.*[^=\);]'
+
+endif
+"}}}
+
+" deoplete-clang"{{{
+"-------------------------
+if neobundle#is_installed('deoplete-clang')
+	let g:deoplete#sources#clang#libclang_path = '/opt/rh/llvm-toolset-7.0/root/usr/lib64/libclang.so'
+	let g:deoplete#sources#clang#clang_header = '/opt/rh/llvm-toolset-7.0/root/usr/include/'
+endif
+"}}}
+
+" deoplete-clangx"{{{
+"-------------------------
+if neobundle#is_installed('deoplete-clangx')
+	" Change clang binary path
+	call deoplete#custom#var('clangx', 'clang_binary', '/opt/rh/llvm-toolset-7.0/root/usr/bin/clang')
+
+	" Change clang options
+	call deoplete#custom#var('clangx', 'default_c_options', '')
+	call deoplete#custom#var('clangx', 'default_cpp_options', '')
+endif
+"}}}
+
 " vim-clang"{{{
 "-------------------------
 if neobundle#is_installed('vim-clang')
@@ -1101,8 +1375,36 @@ endif
 " clang_complete"{{{
 "-------------------------
 if neobundle#is_installed('clang_complete')
-	" 自動呼出しOFF neocomplcacheと競合回避
-	let g:clang_complete_auto=1
+	" path to directory where library can be found
+	let g:clang_library_path='/opt/rh/llvm-toolset-7.0/root/usr/lib64/'
+	" or path directly to the library file
+	let g:clang_library_path='/opt/rh/llvm-toolset-7.0/root/usr/lib64/libclang.so'
+endif
+"}}}
+
+" clang-format"{{{
+"-------------------------
+if neobundle#is_installed('vim-clang-format')
+
+	let g:clang_format#code_style = 'llvm'
+
+	" your favorite style options
+	let g:clang_format#style_options = {
+				\ "UseTab" : "Always",
+				\ "IndentWidth" : 4,
+				\ "AllowShortIfStatementsOnASingleLine" : "false",
+				\ "AlwaysBreakTemplateDeclarations" : "true",
+				\}
+
+	augroup ClangFormatSettings
+		autocmd!
+		" map to <Leader>cf in C++ code
+		autocmd FileType c,cpp,objc nnoremap <buffer><Space>cf :<C-u>ClangFormat<CR>
+		autocmd FileType c,cpp,objc vnoremap <buffer><Space>cf :ClangFormat<CR>
+		" if you install vim-operator-user
+		"autocmd FileType c,cpp,objc map <buffer><Leader>x <Plug>(operator-clang-format)
+	augroup END
+
 endif
 "}}}
 
@@ -1172,6 +1474,10 @@ if neobundle#is_installed('vimfiler')
 	let g:vimfiler_as_default_explorer = 1
 	"表示拒否パターンを変更
 	let g:vimfiler_ignore_pattern = '^\%(.svn\|.git\|.DS_Store\)$'
+
+	call vimfiler#custom#profile('default', 'context', {
+	      \ 'safe' : 0,
+	      \ })
 endif
 "}}}
 
@@ -1229,14 +1535,17 @@ if neobundle#is_installed('vim-quickrun')
 	\	"_" : {
 	\		"runner" : "vimproc",
 	\		"runner/vimproc/updatetime" : 500,
-	\		"outputter/buffer/split" : ":abo 8sp",
+	\		"outputter" : "multi",
+	\		"outputter/multi/targets" : ["buffer","file"],
+	\		"outputter/buffer/split" : ":abo 12sp",
+	\		"outputter/file/name" : "~/.vim_quickrun",
 	\	},
 	\
 	\	"cpp" :{ "type" : "cpp/make" },
 	\	"cpp/make" : {
 	\		"exec" : "make %a",
 	\		"outputter" : "multi",
-	\		"outputter/multi/targets" : ["quickfix","buffer"],
+	\		"outputter/multi/targets" : ["quickfix","buffer","file"],
 	\		"hook/close_buffer/enable_exit" : 1,
 	\		"hook/close_quickfix/enable_exit" : 0,
 	\		"hook/copen/enable_failure" : 1,
@@ -1527,7 +1836,7 @@ if neobundle#is_installed('yankround.vim')
 	nmap P <Plug>(yankround-P)
 	nmap ,p <Plug>(yankround-prev)
 	nmap ,n <Plug>(yankround-next)
-	let g:yankround_max_history = 50
+	let g:yankround_max_history = 100
 	"let g:yankround_dir = '$HOME/.cache/yankround'
 	nnoremap <silent>,y :Unite yankround<CR>
 endif
@@ -2029,7 +2338,7 @@ if neobundle#is_installed('agit.vim')
 	" カーソル移動で一覧と差分を更新させたくない場合は
 	let g:agit_enable_auto_show_commit = 0
 	" ログの行数
-	let g:agit_max_log_lines = 300
+	let g:agit_max_log_lines = 5000
 
 endif
 "}}}
@@ -2039,10 +2348,10 @@ endif
 if neobundle#is_installed('ack.vim')
 
 	" grepを上書き
-	nmap <C-g><C-w> :Ack --cc --cpp --php --ruby --html --sql --python --js --shell --type-set=txt:ext:txt,csv,tmpl,nut --txt "<C-R><C-W>"<CR>
-	nmap <C-g><C-a> :Ack --cc --cpp --php --ruby --html --sql --python --js --shell --type-set=txt:ext:txt,csv,tmpl,nut --txt "<C-R><C-A>"<CR>
-	nmap <C-g><C-j> :exe "Ack -w --cc --cpp --php --ruby --html --sql --python --js --shell --type-set=txt:ext:txt,csv,tmpl,nut --txt ". substitute("<C-R>/","[\<\>]","","g")<CR>
-	nmap <C-g><C-i> :Ack --cc --cpp --php --ruby --html --sql --python --js --shell --type-set=txt:ext:txt,csv,tmpl,nut --txt "<C-R>/"<CR>
+	nmap <C-g><C-w> :Ack --cc --cpp --php --ruby --html --sql --python --js --shell --type-set=txt:ext:txt,csv,tmpl,nut,bat,ini --txt "<C-R><C-W>"<CR>
+	nmap <C-g><C-a> :Ack --cc --cpp --php --ruby --html --sql --python --js --shell --type-set=txt:ext:txt,csv,tmpl,nut,bat,ini --txt "<C-R><C-A>"<CR>
+	nmap <C-g><C-j> :exe "Ack -w --cc --cpp --php --ruby --html --sql --python --js --shell --type-set=txt:ext:txt,csv,tmpl,nut,bat,ini --txt ". substitute("<C-R>/","[\<\>]","","g")<CR>
+	nmap <C-g><C-i> :Ack --cc --cpp --php --ruby --html --sql --python --js --shell --type-set=txt:ext:txt,csv,tmpl,nut,bat,ini --txt "<C-R>/"<CR>
 
 
 endif
@@ -2125,5 +2434,24 @@ if executable('cquery')
 	" autocmd! CompleteDone * if pumvisible() == 0 | pclose | endif
 endif
 "}}}
+
+" vim-dirdiff "{{{
+"-------------------------
+if neobundle#is_installed('vim-dirdiff')
+
+    let g:DirDiffExcludes = "CVS,*.class,*.exe,.*.swp,*.pyc,*.d,*.o,*.a,*.so,.generated,generated_inc,.build"
+
+endif
+"}}}
+
+" operator-camelize "{{{
+"-------------------------
+if neobundle#is_installed('operator-camelize.vim')
+
+	vmap <Space>c <plug>(operator-camelize-toggle)
+
+endif
+"}}}
+
 
 " vim:set foldmethod=marker commentstring="%s :
